@@ -9,18 +9,20 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
 import { EffectsModule } from '@ngrx/effects';
 import { CoreEffects } from './effects/core.effects';
+import { AuthnRedirectComponent } from './components/authn-redirect/authn-redirect.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    AuthnRedirectComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     StoreModule.forRoot(reducers, { metaReducers }),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
-    EffectsModule.forFeature([CoreEffects])
-  ],
+    EffectsModule.forRoot([CoreEffects])
+],
   providers: [],
   bootstrap: [AppComponent]
 })

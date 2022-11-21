@@ -1,17 +1,18 @@
 import { Action, createReducer, on } from '@ngrx/store';
+import { webIdReceived } from '../actions/core.actions';
 
 
 export const coreFeatureKey = 'core';
 
 export interface State {
-  webid: string | null;
+  webId: string | null;
 }
 
 export const initialState: State = {
-  webid: null,
+  webId: null,
 };
 
 export const reducer = createReducer(
   initialState,
-
+  on(webIdReceived, (state, {webId}) => ({...state, webId})),
 );
