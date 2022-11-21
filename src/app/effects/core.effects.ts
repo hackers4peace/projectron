@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { loginRequested, webIdReceived, loginInitiated, incomingLoginRedirect } from '../actions/core.actions'
+import { loginRequested, userIdReceived, loginInitiated, incomingLoginRedirect } from '../actions/core.actions'
 import { AuthnService } from '../services/authn.service';
 import { map, mergeMap, tap } from "rxjs/operators";
 import { from } from 'rxjs';
@@ -23,6 +23,6 @@ export class CoreEffects {
   handleIncomingRedirect$ = createEffect(() => this.actions$.pipe(
     ofType(incomingLoginRedirect),
     mergeMap(({url}) => from(this.authn.handleRedirect(url))),
-    map(oidcInfo => webIdReceived({webId: oidcInfo.webId!}))
+    map(oidcInfo => userIdReceived({userId: oidcInfo.webId!}))
   ))
 }

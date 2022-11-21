@@ -21,7 +21,7 @@ export class AuthnService {
   async login(oidcIssuer: string) {
 
     await this.solidOidc.login({
-      clientId: environment.clientId,
+      clientId: environment.applicationId,
       oidcIssuer,
       redirectUrl: `${environment.baseUrl}/redirect`,
     });

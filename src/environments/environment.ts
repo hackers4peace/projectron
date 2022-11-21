@@ -4,9 +4,10 @@
 
 export const environment = {
   production: false,
-  clientId: 'http://localhost:3000/acme/projectron/id',
+  applicationId: 'http://localhost:3000/acme/projectron/id',
   baseUrl: 'http://localhost:4100',
   defaultOidcIssuer: 'http://localhost:3000',
+
 };
 
 /*

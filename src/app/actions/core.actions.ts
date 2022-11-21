@@ -11,9 +11,9 @@ export const loginInitiated = createAction(
    props<{oidcIssuer: string}>(),
 );
 
-export const webIdReceived = createAction(
-  '[CORE] WebId Received',
-  props<{webId: string}>(),
+export const userIdReceived = createAction(
+  '[CORE] userId Received',
+  props<{userId: string}>(),
 )
 
 export const incomingLoginRedirect = createAction(
