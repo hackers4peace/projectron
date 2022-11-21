@@ -10,18 +10,35 @@ import { environment } from '../environments/environment';
 import { EffectsModule } from '@ngrx/effects';
 import { CoreEffects } from './effects/core.effects';
 import { AuthnRedirectComponent } from './components/authn-redirect/authn-redirect.component';
+import { LoginComponent } from './components/login/login.component';
+
+import { MatButtonModule } from '@angular/material/button'
+import { MatCardModule } from '@angular/material/card'
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from '@angular/material/input';
+import { ReactiveFormsModule } from "@angular/forms";
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
     AppComponent,
-    AuthnRedirectComponent
+    AuthnRedirectComponent,
+    LoginComponent
   ],
   imports: [
-    BrowserModule,
     AppRoutingModule,
+    BrowserModule,
+    EffectsModule.forRoot([CoreEffects]),
+    // material modules
+    MatButtonModule,
+    MatCardModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
+    MatInputModule,
+
     StoreModule.forRoot(reducers, { metaReducers }),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
-    EffectsModule.forRoot([CoreEffects])
+    BrowserAnimationsModule,
 ],
   providers: [],
   bootstrap: [AppComponent]
