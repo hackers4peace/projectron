@@ -20,3 +20,13 @@ export const incomingLoginRedirect = createAction(
   '[CORE] Incoming Login Redirect',
   props<{url: string}>(),
 );
+
+export const applicationRegistrationDiscovered = createAction(
+  '[CORE] Application Registration Discovered',
+  props<{applicationRegistrationIri: string}>(),
+)
+
+export const authorizationNeeded = createAction(
+  '[CORE] Authorization Needed',
+  props<{redirectIri: string}>(),
+)

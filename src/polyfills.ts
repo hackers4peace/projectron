@@ -51,3 +51,7 @@ import 'zone.js';  // Included with Angular CLI.
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
+
+// jsonld parser uses Buffer
+// @ts-ignore
+window.Buffer = window.Buffer || require('buffer').Buffer;
