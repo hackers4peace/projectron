@@ -4,12 +4,23 @@ import { AuthnRedirectComponent } from './components/authn-redirect/authn-redire
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { LoginComponent } from './components/login/login.component';
 import { RequestAuthorizationComponent } from './components/request-authorization/request-authorization.component';
+import { AuthGuard } from './guards/auth.guard';
+
+
 
 const routes: Routes = [
   { path: 'redirect', component: AuthnRedirectComponent },
   { path: 'login', component: LoginComponent },
   { path: 'request-authorization', component: RequestAuthorizationComponent },
-{ path: 'dashboard', component: DashboardComponent },
+  {
+    path: '',
+    canActivateChild: [AuthGuard] ,
+    children: [
+      {
+        path: 'dashboard', component: DashboardComponent,
+      },
+    ]
+  }
 ];
 
 @NgModule({
