@@ -22,8 +22,8 @@ export class SaiService {
     return this.session;
   }
 
-  authorize(redirectIri: string) {
-    window.location.href = redirectIri;
+  authorize(authorizationRedirectUri: string) {
+    window.location.href = authorizationRedirectUri;
   }
 
     // this.session$ = store.select(userId).pipe(

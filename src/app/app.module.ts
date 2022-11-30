@@ -18,12 +18,16 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RequestAuthorizationComponent } from './components/request-authorization/request-authorization.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AuthnRedirectComponent,
-    LoginComponent
+    LoginComponent,
+    RequestAuthorizationComponent,
+    DashboardComponent
   ],
   imports: [
     AppRoutingModule,
