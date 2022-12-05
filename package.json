@@ -22,6 +22,8 @@
     "@angular/router": "^14.2.0",
     "@inrupt/solid-client-authn-browser": "^1.12.2",
     "@janeirodigital/interop-application": "^1.0.0-rc.14",
+    "@janeirodigital/interop-data-model": "^1.0.0-rc.14",
+    "@janeirodigital/interop-namespaces": "^1.0.0-rc.14",
     "@ngrx/effects": "^14.3.2",
     "@ngrx/store": "^14.3.2",
     "@ngrx/store-devtools": "^14.3.2",

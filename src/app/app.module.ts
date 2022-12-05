@@ -20,6 +20,7 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RequestAuthorizationComponent } from './components/request-authorization/request-authorization.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { DataEffects } from './effects/data.effects';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
     StoreModule.forRoot(reducers, { metaReducers }),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     BrowserAnimationsModule,
+    EffectsModule.forFeature([DataEffects]),
 ],
   providers: [],
   bootstrap: [AppComponent]
