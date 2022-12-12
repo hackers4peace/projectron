@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { loadMyProjects } from 'src/app/actions/data.actions';
+import { selectMyProjects, selectProjects, selectProjectsForOwner } from 'src/app/selectors/data.selector';
 
 @Component({
   selector: 'app-dashboard',
@@ -6,10 +9,12 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+  projects$ = this.store.select(selectMyProjects)
 
-  constructor() { }
-
-  ngOnInit(): void {
+  constructor(private store: Store) {
   }
 
+  ngOnInit(): void {
+    this.store.dispatch(loadMyProjects());
+  }
 }

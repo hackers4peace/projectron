@@ -23,7 +23,7 @@ export class SaiService {
     window.location.href = authorizationRedirectUri;
   }
 
-  async loadProjects(ownerId: string): Promise<Project[]> {
+  async loadProjects(ownerId: string): Promise<{ownerId: string, projects: Project[]}> {
     if (!this.session) {
       throw new Error('buildSession was not called');
     }
@@ -38,6 +38,6 @@ export class SaiService {
       }
     }
 
-    return projects;
+    return {ownerId, projects}
   }
 }

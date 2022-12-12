@@ -6,9 +6,13 @@ export const loadProjects = createAction(
   props<{ ownerId: string }>()
 );
 
+export const loadMyProjects = createAction(
+  '[Data] Load My Projects',
+);
+
 export const loadProjectsSuccess = createAction(
   '[Data] Load Projects Success',
-  props<{ projects: Project[] }>()
+  props<{ ownerId: string, projects: Project[] }>()
 );
 
 export const loadProjectsFailure = createAction(
