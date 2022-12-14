@@ -1,0 +1,9 @@
+<mat-card *ngIf="(project$ | async) as project">
+  <mat-card-header>
+    <mat-card-title>{{ project.label }}</mat-card-title>
+  </mat-card-header>
+  <mat-card-actions>
+    <!-- TODO: show conditionally based on access mode -->
+    <button mat-button [routerLink]="['/project-edit']" [queryParams]="{id: project.id}">EDIT</button>
+  </mat-card-actions>
+</mat-card>

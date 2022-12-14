@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { loginRequested, userIdReceived, loginInitiated, incomingLoginRedirect, applicationRegistrationDiscovered, authorizationRedirectUriDiscovered, authorizationRequested } from '../actions/core.actions'
 import { AuthnService } from '../services/authn.service';
 import { map, mergeMap, tap } from "rxjs/operators";
 import { from } from 'rxjs';
 import { SaiService } from '../services/sai.service';
-import { EMPTY } from 'rxjs';
 import { authorizationRedirectUri } from '../selectors/core.selector';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
@@ -45,16 +44,6 @@ export class CoreEffects {
       }
     })
   ))
-
-  naviagateToRequestAuthorization$ = createEffect(() => this.actions$.pipe(
-    ofType(authorizationRedirectUriDiscovered),
-    tap(() => this.router.navigateByUrl('/request-authorization'))
-  ), {dispatch: false});
-
-  naviagateToDashboard$ = createEffect(() => this.actions$.pipe(
-    ofType(applicationRegistrationDiscovered),
-    tap(() => this.router.navigateByUrl('/dashboard'))
-  ), {dispatch: false});
 
   requestAuthorization$ = createEffect(() => this.actions$.pipe(
     ofType(authorizationRequested),

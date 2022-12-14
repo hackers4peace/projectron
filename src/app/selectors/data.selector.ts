@@ -11,6 +11,12 @@ export const selectProjects = createSelector(
   data => data.projects
 )
 
+export const selectProject = (id: string) =>
+  createSelector(
+    selectData,
+    data => Object.values(data.projects).flat().find(project => project.id === id)!
+  )
+
 export const selectProjectsForOwner = (ownerId: string) =>
   createSelector(
     selectData,

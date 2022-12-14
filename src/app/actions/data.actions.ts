@@ -19,3 +19,18 @@ export const loadProjectsFailure = createAction(
   '[Data] Load Projects Failure',
   props<{ error: any }>()
 );
+
+export const updateProject = createAction(
+  '[Data] Update Project',
+  props<{ project: Project }>()
+)
+
+export const updateProjectSuccess = createAction(
+  '[Data] Update Project Success',
+  props<{ project: Project }>()
+)
+
+export const updateProjectFailure = createAction(
+  '[Data] Update Project Failure',
+  props<{ error: any }>()
+)
