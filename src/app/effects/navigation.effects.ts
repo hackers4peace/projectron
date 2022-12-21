@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { applicationRegistrationDiscovered, authorizationRedirectUriDiscovered } from '../actions/core.actions'
 import { tap } from "rxjs/operators";
 import { Router } from '@angular/router';
-import { updateProjectSuccess } from '../actions/data.actions';
+import { updateProjectSuccess, updateTaskSuccess } from '../actions/data.actions';
 
 @Injectable()
 export class NavigationEffects {
@@ -19,13 +19,18 @@ export class NavigationEffects {
 
   naviagateToDashboard$ = createEffect(() => this.actions$.pipe(
     ofType(applicationRegistrationDiscovered),
-    tap(() => this.router.navigateByUrl('/dashboard'))
+    tap(() => this.router.navigateByUrl('/'))
   ), {dispatch: false});
 
 
   naviagateBackToProject$ = createEffect(() => this.actions$.pipe(
     ofType(updateProjectSuccess),
     tap(({ project }) => this.router.navigateByUrl(`/project?id=${project.id}`))
+  ), {dispatch: false});
+
+  naviagateBackToProjectFromTask$ = createEffect(() => this.actions$.pipe(
+    ofType(updateTaskSuccess),
+    tap(({ task }) => this.router.navigateByUrl(`/project?id=${task.project}`))
   ), {dispatch: false});
 
 }

@@ -1,0 +1,11 @@
+<mat-card *ngIf="(task$ | async) as task">
+  <mat-card-content>
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+      <mat-form-field class="full-width-input">
+        <input matInput [ngModel]="task.label" formControlName="label">
+        <mat-error>Please provide a valid label</mat-error>
+      </mat-form-field>
+      <button mat-raised-button color="primary">Save</button>
+    </form>
+  </mat-card-content>
+</mat-card>

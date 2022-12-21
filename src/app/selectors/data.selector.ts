@@ -17,6 +17,19 @@ export const selectProject = (id: string) =>
     data => Object.values(data.projects).flat().find(project => project.id === id)!
   )
 
+export const selectTasks = (projectId: string) =>
+  createSelector(
+    selectData,
+    data => data.tasks[projectId]
+  )
+
+export const selectTask = (id: string) =>
+  createSelector(
+    selectData,
+    data => Object.values(data.tasks).flat().find(task => task.id === id)!
+  )
+
+
 export const selectProjectsForOwner = (ownerId: string) =>
   createSelector(
     selectData,

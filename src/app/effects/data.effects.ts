@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { catchError, filter, from, map, of, switchMap } from 'rxjs';
-import { loadMyProjects, loadProjects, loadProjectsFailure, loadProjectsSuccess, updateProject, updateProjectFailure, updateProjectSuccess } from '../actions/data.actions';
+import { loadMyProjects, loadProjects, loadProjectsFailure, loadProjectsSuccess, loadTasks, loadTasksFailure, loadTasksSuccess, updateProject, updateProjectFailure, updateProjectSuccess, updateTask, updateTaskFailure, updateTaskSuccess } from '../actions/data.actions';
 import { userId } from '../selectors/core.selector';
 import { SaiService } from '../services/sai.service';
 
@@ -37,5 +37,22 @@ export class DataEffects {
     switchMap(({ project }) => from(this.sai.updateProject(project))),
     map(project => updateProjectSuccess({ project })),
     catchError(error => of(updateProjectFailure({error})))
+  ))
+  
+  loadTasks$ = createEffect(() => this.actions$.pipe(
+    ofType(loadTasks),
+    switchMap(({projectId}) => from(this.sai.loadTasks(projectId))),
+    map(data => loadTasksSuccess(data)),
+    catchError(error => {
+      console.log(error)
+      return of(loadTasksFailure({error}))
+    })
+  ))
+
+  updateTask$ = createEffect(() => this.actions$.pipe(
+    ofType(updateTask),
+    switchMap(({ task }) => from(this.sai.updateTask(task))),
+    map(task => updateTaskSuccess({ task })),
+    catchError(error => of(updateTaskFailure({error})))
   ))
 }

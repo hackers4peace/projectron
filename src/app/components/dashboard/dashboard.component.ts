@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { loadMyProjects } from 'src/app/actions/data.actions';
-import { selectMyProjects, selectProjects, selectProjectsForOwner } from 'src/app/selectors/data.selector';
+import { selectMyProjects } from 'src/app/selectors/data.selector';
 
 @Component({
   selector: 'app-dashboard',

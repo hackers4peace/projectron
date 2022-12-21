@@ -25,6 +25,7 @@ import { RequestAuthorizationComponent } from './components/request-authorizatio
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ProjectComponent } from './components/project/project.component';
 import { ProjectEditComponent } from './components/project-edit/project-edit.component';
+import { TaskEditComponent } from './components/task-edit/task-edit.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { ProjectEditComponent } from './components/project-edit/project-edit.com
     RequestAuthorizationComponent,
     DashboardComponent,
     ProjectComponent,
-    ProjectEditComponent
+    ProjectEditComponent,
+    TaskEditComponent
   ],
   imports: [
     MaterialModule,

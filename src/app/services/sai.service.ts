@@ -5,6 +5,7 @@ import { DataInstance } from '@janeirodigital/interop-data-model';
 import { RDFS } from '@janeirodigital/interop-namespaces';
 import { environment } from 'src/environments/environment';
 import { Project } from '../models/project.model';
+import { Task } from '../models/task.model';
 
 function instance2Project(instance: DataInstance, owner: string): Project {
   return {
@@ -14,8 +15,17 @@ function instance2Project(instance: DataInstance, owner: string): Project {
   }
 }
 
+function instance2Task(instance: DataInstance, project: string): Task {
+  return {
+    id: instance.iri,
+    label: instance.getObject(RDFS.label)!.value,
+    project
+  }
+}
+
 const shapeTrees = {
-  project: 'http://localhost:3000/shapetrees/trees/Project'
+  project: 'http://localhost:3000/shapetrees/trees/Project',
+  task: 'http://localhost:3000/shapetrees/trees/Task'
 }
 
 @Injectable({
@@ -69,5 +79,35 @@ export class SaiService {
     await instance.update(instance.dataset)
 
     return instance2Project(instance, project.owner)
+  }
+
+  async loadTasks(projectId: string): Promise<{projectId: string, tasks: Task[]}> {
+    if (!this.session) {
+      throw new Error('buildSession was not called');
+    }
+    const project = this.cache.find(i => i.iri === projectId)
+    if (!project) {
+      throw new Error(`Project not found for: ${projectId}`)
+    }
+    const tasks = [];
+    for await (const dataInstance of project.getChildInstancesIterator(shapeTrees.task)) {
+      this.cache.push(dataInstance)
+      tasks.push(instance2Task(dataInstance, projectId));
+    }
+
+    return {projectId, tasks}
+  }
+
+  async updateTask(task: Task) {
+    const instance = this.cache.find(i => i.iri === task.id)
+    if (!instance) {
+      throw new Error(`Data Instance not found for: ${task.id}`)
+    }
+
+    instance.replaceValue(RDFS.label, task.label);
+
+    await instance.update(instance.dataset)
+
+    return instance2Task(instance, task.project)
   }
 }

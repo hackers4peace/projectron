@@ -1,9 +1,19 @@
-<p>dashboard works!</p>
+<mat-drawer-container autosize>
+  <mat-drawer #drawer mode="side" opened>
+    <mat-form-field appearance="fill">
+      <mat-select value="me">
+        <mat-option value="me">Me</mat-option>
+        <mat-option value="someone">Someone</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <div>
+      <mat-nav-list>
+        <a *ngFor="let project of (projects$ | async)" [routerLink]="['/project']" [queryParams]="{id: project.id}" mat-list-item href="...">{{ project.label }}</a>
+      </mat-nav-list>
+    </div>
+  </mat-drawer>
 
-<mat-card>
-  <mat-card-content>
-    <mat-nav-list>
-      <a *ngFor="let project of (projects$ | async)" [routerLink]="['/project']" [queryParams]="{id: project.id}" mat-list-item href="...">{{ project.label }}</a>
-    </mat-nav-list>
-  </mat-card-content>
-</mat-card>
+  <div style="height: 100vh;">
+    <router-outlet></router-outlet>
+  </div>
+
