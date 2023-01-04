@@ -1,20 +1,22 @@
-<mat-card *ngIf="(project$ | async) as project">
-  <mat-card-header>
-    <mat-card-title>{{ project.label }}</mat-card-title>
-  </mat-card-header>
-  <mat-card-actions>
-    <!-- TODO: show conditionally based on access mode -->
-    <button mat-button [routerLink]="['/project-edit']" [queryParams]="{id: project.id}">EDIT</button>
-  </mat-card-actions>
-</mat-card>
+<div *ngIf="(project$ | async) as project">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ project.label }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-actions>
+      <!-- TODO: show conditionally based on access mode -->
+      <button mat-button [routerLink]="['/project-edit']" [queryParams]="{id: project.id}">EDIT</button>
+    </mat-card-actions>
+  </mat-card>
 
-<mat-card *ngIf="(tasks$ | async) as tasks">
-  <mat-card-header>
-    <mat-card-title>Tasks</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <mat-list role="list">
-        <mat-list-item *ngFor="let task of tasks" role="listitem"><a [routerLink]="['/task-edit']" [queryParams]="{id: task.id}" href="...">{{ task.label }}</a></mat-list-item>
-    </mat-list>
-  </mat-card-content>
-</mat-card>
+  <mat-card *ngIf="(tasks$ | async) as tasks">
+    <mat-card-header>
+      <mat-card-title>Tasks</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-list role="list">
+          <mat-list-item *ngFor="let task of tasks" role="listitem"><a [routerLink]="['/task-edit']" [queryParams]="{taskId: task.id, projectId: project.id | encodeURIComponent, agentId: project.owner | encodeURIComponent}">{{ task.label }}</a></mat-list-item>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+</div>

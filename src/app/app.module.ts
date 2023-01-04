@@ -11,6 +11,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgEncodeURIComponentPipeModule } from 'angular-pipes'
 
 import { EffectsModule } from '@ngrx/effects';
 import { CoreEffects } from './effects/core.effects';
@@ -47,6 +48,7 @@ import { TaskEditComponent } from './components/task-edit/task-edit.component';
     StoreModule.forRoot(reducers, { metaReducers }),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     BrowserAnimationsModule,
+    NgEncodeURIComponentPipeModule
 ],
   providers: [],
   bootstrap: [AppComponent]

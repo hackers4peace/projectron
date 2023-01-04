@@ -6,6 +6,7 @@ import { RDFS } from '@janeirodigital/interop-namespaces';
 import { environment } from 'src/environments/environment';
 import { Project } from '../models/project.model';
 import { Task } from '../models/task.model';
+import { Agent } from '../models/agent.model';
 
 function instance2Project(instance: DataInstance, owner: string): Project {
   return {
@@ -15,11 +16,12 @@ function instance2Project(instance: DataInstance, owner: string): Project {
   }
 }
 
-function instance2Task(instance: DataInstance, project: string): Task {
+function instance2Task(instance: DataInstance, project: string, owner: string): Task {
   return {
     id: instance.iri,
     label: instance.getObject(RDFS.label)!.value,
-    project
+    project,
+    owner
   }
 }
 
@@ -34,6 +36,7 @@ const shapeTrees = {
 export class SaiService {
   private session: Application | undefined;
   private cache: DataInstance[] = []
+  private ownerIndex: { [key: string]: string } = {}
 
   async buildSession(userId: string): Promise<Application> {
     this.session = await Application.build(
@@ -49,6 +52,20 @@ export class SaiService {
     window.location.href = authorizationRedirectUri;
   }
 
+  async getAgents(): Promise<Agent[]> {
+    if (!this.session) {
+      throw new Error('buildSession was not called');
+    }
+    const session = this.session
+    const profiles = await Promise.all(
+      this.session.dataOwners.map(owner => session.factory.readable.webIdProfile(owner.iri))
+    )
+    return profiles.map(profile => ({
+      id: profile.iri,
+      label: profile.label || 'unknown' // TODO think of a better fallback
+    }))
+  }
+
   async loadProjects(ownerId: string): Promise<{ownerId: string, projects: Project[]}> {
     if (!this.session) {
       throw new Error('buildSession was not called');
@@ -61,6 +78,7 @@ export class SaiService {
     for (const registration of user.selectRegistrations(shapeTrees.project)) {
       for await (const dataInstance of registration.dataInstances) {
         this.cache.push(dataInstance)
+        this.ownerIndex[dataInstance.iri] = ownerId
         projects.push(instance2Project(dataInstance, ownerId));
       }
     }
@@ -92,7 +110,7 @@ export class SaiService {
     const tasks = [];
     for await (const dataInstance of project.getChildInstancesIterator(shapeTrees.task)) {
       this.cache.push(dataInstance)
-      tasks.push(instance2Task(dataInstance, projectId));
+      tasks.push(instance2Task(dataInstance, projectId, this.ownerIndex[projectId]));
     }
 
     return {projectId, tasks}
@@ -108,6 +126,6 @@ export class SaiService {
 
     await instance.update(instance.dataset)
 
-    return instance2Task(instance, task.project)
+    return instance2Task(instance, task.project, task.owner)
   }
 }

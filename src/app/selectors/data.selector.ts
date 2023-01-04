@@ -2,13 +2,18 @@
 import {createFeatureSelector, createSelector} from "@ngrx/store";
 import {dataFeatureKey, State} from "../reducers/data.reducer";
 import { userId } from "./core.selector";
-import { Project } from "../models/project.model";
 
 export const selectData = createFeatureSelector<State>(dataFeatureKey);
 
-export const selectProjects = createSelector(
+export const selectAgent = (id: string) =>
+  createSelector(
+    selectData,
+    data => data.agents.find(agent => agent.id === id)!
+  )
+
+export const selectAgents = createSelector(
   selectData,
-  data => data.projects
+  data => data.agents
 )
 
 export const selectProject = (id: string) =>
@@ -41,3 +46,9 @@ export const selectMyProjects = createSelector(
   selectData,
   (ownerId, data) => ownerId ? data.projects[ownerId] ?? [] : []
 )
+
+export const selectProjects = (ownerId: string) =>
+  createSelector(
+    selectData,
+    data => data.projects[ownerId]
+  )

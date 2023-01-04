@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { mergeMap, Observable, tap } from 'rxjs';
+import { map, mergeMap, Observable, tap } from 'rxjs';
 import { Project } from 'src/app/models/project.model';
 import { Task } from 'src/app/models/task.model';
 import { loadTasks } from 'src/app/actions/data.actions';
@@ -23,8 +23,9 @@ export class ProjectComponent implements OnInit {
 
   ngOnInit(): void {
     this.project$ = this.route.queryParams.pipe(
-      tap(params => this.store.dispatch(loadTasks({ projectId: params['id'] }))),
-      mergeMap(params =>  this.store.select(selectProject(params['id'])))
+      map(params => decodeURIComponent(params['projectId'])),
+      tap(projectId => this.store.dispatch(loadTasks({ projectId }))),
+      mergeMap(projectId =>  this.store.select(selectProject( projectId )))
     );
     this.tasks$ = this.project$.pipe(
       mergeMap(project =>  this.store.select(selectTasks(project.id)))

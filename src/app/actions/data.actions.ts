@@ -1,14 +1,16 @@
 import { createAction, props } from '@ngrx/store';
+import { Agent } from '../models/agent.model';
 import { Project } from '../models/project.model';
 import { Task } from '../models/task.model';
+
+export const agentsKnown = createAction(
+  '[Data] Agents Known',
+  props<{ agents: Agent[] }>()
+)
 
 export const loadProjects = createAction(
   '[Data] Load Projects',
   props<{ ownerId: string }>()
-);
-
-export const loadMyProjects = createAction(
-  '[Data] Load My Projects',
 );
 
 export const loadProjectsSuccess = createAction(

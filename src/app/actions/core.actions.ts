@@ -1,4 +1,3 @@
-import type { ISessionInfo } from '@inrupt/solid-client-authn-browser';
 import { createAction, props } from '@ngrx/store';
 
 export const loginRequested = createAction(

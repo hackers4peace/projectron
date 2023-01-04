@@ -1,7 +1,8 @@
 import { createReducer, on } from '@ngrx/store';
-import { loadProjectsSuccess, loadTasksSuccess, updateProjectSuccess, updateTaskSuccess } from '../actions/data.actions';
+import { agentsKnown, loadProjectsSuccess, loadTasksSuccess, updateProjectSuccess, updateTaskSuccess } from '../actions/data.actions';
 import { Project } from '../models/project.model';
 import { Task } from '../models/task.model';
+import { Agent } from '../models/agent.model';
 
 
 export const dataFeatureKey = 'data';
@@ -9,15 +10,18 @@ export const dataFeatureKey = 'data';
 export interface State {
   projects: {[ownerId: string]: Project[]};
   tasks: {[projectId: string]: Task[]};
+  agents: Agent[];
 }
 
 export const initialState: State = {
   projects: {},
-  tasks: {}
+  tasks: {},
+  agents: []
 };
 
 export const reducer = createReducer(
   initialState,
+  on(agentsKnown, (state, { agents }) => ({...state, agents })),
   on(loadProjectsSuccess, (state, {ownerId, projects}) => ({...state, projects: {...state.projects, [ownerId]: projects} })),
   on(updateProjectSuccess, (state, {project}) => {
     const oldProjects = state.projects[project.owner]

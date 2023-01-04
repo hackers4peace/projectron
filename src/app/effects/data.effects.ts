@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { catchError, filter, from, map, of, switchMap } from 'rxjs';
-import { loadMyProjects, loadProjects, loadProjectsFailure, loadProjectsSuccess, loadTasks, loadTasksFailure, loadTasksSuccess, updateProject, updateProjectFailure, updateProjectSuccess, updateTask, updateTaskFailure, updateTaskSuccess } from '../actions/data.actions';
+import { applicationRegistrationDiscovered } from '../actions/core.actions';
+import { agentsKnown, loadProjects, loadProjectsFailure, loadProjectsSuccess, loadTasks, loadTasksFailure, loadTasksSuccess, updateProject, updateProjectFailure, updateProjectSuccess, updateTask, updateTaskFailure, updateTaskSuccess } from '../actions/data.actions';
 import { userId } from '../selectors/core.selector';
 import { SaiService } from '../services/sai.service';
 
@@ -18,18 +19,17 @@ export class DataEffects {
     private store: Store,
     ) {}
 
+  getAgents$ = createEffect(() => this.actions$.pipe(
+    ofType(applicationRegistrationDiscovered),
+    switchMap(() => from(this.sai.getAgents())),
+    map(agents => agentsKnown({ agents } ))
+  ))
+
   loadProjects$ = createEffect(() => this.actions$.pipe(
     ofType(loadProjects),
     switchMap(({ownerId}) => from(this.sai.loadProjects(ownerId))),
     map(data => loadProjectsSuccess(data)),
     catchError(error => of(loadProjectsFailure({error})))
-  ))
-
-  loadMyProjects$ = createEffect(() => this.actions$.pipe(
-    ofType(loadMyProjects),
-    switchMap(() => this.store.select(userId)),
-    filter(ownerId => !!ownerId),
-    map(ownerId => loadProjects({ownerId: ownerId!}))
   ))
 
   updateProject$ = createEffect(() => this.actions$.pipe(
