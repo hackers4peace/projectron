@@ -35,7 +35,7 @@ const shapeTrees = {
 })
 export class SaiService {
   private session: Application | undefined;
-  private cache: DataInstance[] = []
+  private cache: { [key: string]: DataInstance } = {}
   private ownerIndex: { [key: string]: string } = {}
 
   async buildSession(userId: string): Promise<Application> {
@@ -77,7 +77,7 @@ export class SaiService {
     const projects = [];
     for (const registration of user.selectRegistrations(shapeTrees.project)) {
       for await (const dataInstance of registration.dataInstances) {
-        this.cache.push(dataInstance)
+        this.cache[dataInstance.iri] = dataInstance
         this.ownerIndex[dataInstance.iri] = ownerId
         projects.push(instance2Project(dataInstance, ownerId));
       }
@@ -92,7 +92,7 @@ export class SaiService {
     }
     let instance: DataInstance
     if (project.id !== 'DRAFT') {
-      const cached = this.cache.find(i => i.iri === project.id)
+      const cached = this.cache[project.id]
       if (!cached) {
         throw new Error(`Data Instance not found for: ${project.id}`)
       }
@@ -104,7 +104,9 @@ export class SaiService {
       }
       const registration = user.selectRegistrations(shapeTrees.project)[0] // TODO handle multiple
       instance = await registration.newDataInstance()
-      this.cache.push(instance)
+      console.log(instance.iri, [...instance.dataset])
+      console.log(this.cache)
+      this.cache[instance.iri] = instance
     }
 
     instance.replaceValue(RDFS.label, project.label);
@@ -118,13 +120,13 @@ export class SaiService {
     if (!this.session) {
       throw new Error('buildSession was not called');
     }
-    const project = this.cache.find(i => i.iri === projectId)
+    const project = this.cache[projectId]
     if (!project) {
       throw new Error(`Project not found for: ${projectId}`)
     }
     const tasks = [];
     for await (const dataInstance of project.getChildInstancesIterator(shapeTrees.task)) {
-      this.cache.push(dataInstance)
+      this.cache[dataInstance.iri] = dataInstance
       tasks.push(instance2Task(dataInstance, projectId, this.ownerIndex[projectId]));
     }
 
@@ -137,18 +139,20 @@ export class SaiService {
     }
     let instance: DataInstance
     if (task.id !== 'DRAFT') {
-      const cached = this.cache.find(i => i.iri === task.id)
+      const cached = this.cache[task.id]
       if (!cached) {
         throw new Error(`Data Instance not found for: ${task.id}`)
       }
       instance = cached
     } else {
-      const project = this.cache.find(i => i.iri = task.project)
+      const project = this.cache[task.project]
       if (!project) {
         throw new Error(`project not found ${task.project}`)
       }
+      console.log(project.iri, [...project.dataset])
+      console.log(this.cache)
       instance = await project.newChildDataInstance(shapeTrees.task)
-      this.cache.push(instance)
+      this.cache[instance.iri] = instance
     }
 
     instance.replaceValue(RDFS.label, task.label);
