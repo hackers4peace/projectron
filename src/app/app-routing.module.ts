@@ -8,6 +8,7 @@ import { ProjectComponent } from './components/project/project.component';
 import { TaskEditComponent } from './components/task-edit/task-edit.component';
 import { RequestAuthorizationComponent } from './components/request-authorization/request-authorization.component';
 import { AuthGuard } from './guards/auth.guard';
+import { ProjectCreateComponent } from './components/project-create/project-create.component';
 
 
 
@@ -24,6 +25,9 @@ const routes: Routes = [
       },
       {
         path: 'project-edit', component: ProjectEditComponent,
+      },
+      {
+        path: 'project-create', component: ProjectCreateComponent,
       },
       {
         path: 'task-edit', component: TaskEditComponent,

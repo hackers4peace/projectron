@@ -42,7 +42,7 @@ export class SaiService {
     this.session = await Application.build(
       userId!,
       environment.applicationId,
-      { fetch: getDefaultSession().fetch, randomUUID: self.crypto.randomUUID }
+      { fetch: getDefaultSession().fetch, randomUUID: crypto.randomUUID.bind(crypto) }
     );
 
     return this.session;
@@ -87,9 +87,24 @@ export class SaiService {
   }
 
   async updateProject(project: Project) {
-    const instance = this.cache.find(i => i.iri === project.id)
-    if (!instance) {
-      throw new Error(`Data Instance not found for: ${project.id}`)
+    if (!this.session) {
+      throw new Error('buildSession was not called');
+    }
+    let instance: DataInstance
+    if (project.id !== 'DRAFT') {
+      const cached = this.cache.find(i => i.iri === project.id)
+      if (!cached) {
+        throw new Error(`Data Instance not found for: ${project.id}`)
+      }
+      instance = cached
+    } else {
+      const user = this.session.dataOwners.find((agent) => agent.iri === project.owner);
+      if (!user) {
+        throw new Error(`data registration not found for ${project.owner}`)
+      }
+      const registration = user.selectRegistrations(shapeTrees.project)[0] // TODO handle multiple
+      instance = await registration.newDataInstance()
+      this.cache.push(instance)
     }
 
     instance.replaceValue(RDFS.label, project.label);

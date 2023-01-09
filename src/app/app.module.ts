@@ -27,6 +27,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ProjectComponent } from './components/project/project.component';
 import { ProjectEditComponent } from './components/project-edit/project-edit.component';
 import { TaskEditComponent } from './components/task-edit/task-edit.component';
+import { ProjectCreateComponent } from './components/project-create/project-create.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { TaskEditComponent } from './components/task-edit/task-edit.component';
     DashboardComponent,
     ProjectComponent,
     ProjectEditComponent,
-    TaskEditComponent
+    TaskEditComponent,
+    ProjectCreateComponent
   ],
   imports: [
     MaterialModule,

@@ -6,10 +6,14 @@
       </mat-select>
     </mat-form-field>
     <div>
+      <button mat-raised-button color="primary" (click)="create()">Create</button>
+    </div>
+    <div>
       <mat-nav-list>
         <a *ngFor="let project of (projects$ | async)" [routerLink]="['/project']" [queryParams]="{projectId: project.id | encodeURIComponent, agentId: selectedAgent.id | encodeURIComponent}" mat-list-item href="...">{{ project.label }}</a>
       </mat-nav-list>
     </div>
+
   </mat-drawer>
 
   <div style="height: 100vh;">
