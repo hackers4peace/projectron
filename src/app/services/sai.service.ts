@@ -132,9 +132,23 @@ export class SaiService {
   }
 
   async updateTask(task: Task) {
-    const instance = this.cache.find(i => i.iri === task.id)
-    if (!instance) {
-      throw new Error(`Data Instance not found for: ${task.id}`)
+    if (!this.session) {
+      throw new Error('buildSession was not called');
+    }
+    let instance: DataInstance
+    if (task.id !== 'DRAFT') {
+      const cached = this.cache.find(i => i.iri === task.id)
+      if (!cached) {
+        throw new Error(`Data Instance not found for: ${task.id}`)
+      }
+      instance = cached
+    } else {
+      const project = this.cache.find(i => i.iri = task.project)
+      if (!project) {
+        throw new Error(`project not found ${task.project}`)
+      }
+      instance = await project.newChildDataInstance(shapeTrees.task)
+      this.cache.push(instance)
     }
 
     instance.replaceValue(RDFS.label, task.label);

@@ -9,6 +9,7 @@ import { TaskEditComponent } from './components/task-edit/task-edit.component';
 import { RequestAuthorizationComponent } from './components/request-authorization/request-authorization.component';
 import { AuthGuard } from './guards/auth.guard';
 import { ProjectCreateComponent } from './components/project-create/project-create.component';
+import { TaskCreateComponent } from './components/task-create/task-create.component';
 
 
 
@@ -31,6 +32,9 @@ const routes: Routes = [
       },
       {
         path: 'task-edit', component: TaskEditComponent,
+      },
+      {
+        path: 'task-create', component: TaskCreateComponent,
       },
     ]
   }

@@ -14,6 +14,9 @@
       <mat-card-title>Tasks</mat-card-title>
     </mat-card-header>
     <mat-card-content>
+    <div>
+      <button mat-raised-button color="primary" (click)="create()">Create</button>
+    </div>
       <mat-list role="list">
           <mat-list-item *ngFor="let task of tasks" role="listitem"><a [routerLink]="['/task-edit']" [queryParams]="{taskId: task.id, projectId: project.id | encodeURIComponent, agentId: project.owner | encodeURIComponent}">{{ task.label }}</a></mat-list-item>
       </mat-list>

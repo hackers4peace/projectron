@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { map, mergeMap, Observable, tap } from 'rxjs';
+import { filter, map, mergeMap, Observable, take, tap } from 'rxjs';
 import { Project } from 'src/app/models/project.model';
 import { Task } from 'src/app/models/task.model';
 import { loadTasks } from 'src/app/actions/data.actions';
@@ -18,6 +18,7 @@ export class ProjectComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private store: Store,
   ) { }
 
@@ -31,4 +32,15 @@ export class ProjectComponent implements OnInit {
       mergeMap(project =>  this.store.select(selectTasks(project.id)))
     )
   }
+
+  create() {
+    this.project$?.pipe(
+      filter(project => !!project),
+      take(1),
+    )
+    .subscribe(project => {
+      this.router.navigateByUrl(`/task-create?agentId=${encodeURIComponent(project.owner)}&projectId=${encodeURIComponent(project.id)}`)
+    });
+  }
+
 }
