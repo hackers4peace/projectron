@@ -7,12 +7,14 @@ import { environment } from 'src/environments/environment';
 import { Project } from '../models/project.model';
 import { Task } from '../models/task.model';
 import { Agent } from '../models/agent.model';
+import { Registration } from '../models/registration.model';
 
-function instance2Project(instance: DataInstance, owner: string): Project {
+function instance2Project(instance: DataInstance, owner: string, registration: string): Project {
   return {
     id: instance.iri,
     label: instance.getObject(RDFS.label)!.value,
-    owner
+    owner,
+    registration
   }
 }
 
@@ -66,7 +68,7 @@ export class SaiService {
     }))
   }
 
-  async loadProjects(ownerId: string): Promise<{ownerId: string, projects: Project[]}> {
+  async loadProjects(ownerId: string): Promise<{ownerId: string, projects: Project[], registrations: Registration[]}> {
     if (!this.session) {
       throw new Error('buildSession was not called');
     }
@@ -74,16 +76,18 @@ export class SaiService {
     if (!user) {
       throw new Error(`data registration not found for ${ownerId}`)
     }
-    const projects = [];
+    const projects: Project[] = [];
+    const registrations: Registration[] = [];
     for (const registration of user.selectRegistrations(shapeTrees.project)) {
+      registrations.push({ id: registration.iri, label: 'TODO', owner: ownerId})
       for await (const dataInstance of registration.dataInstances) {
         this.cache[dataInstance.iri] = dataInstance
         this.ownerIndex[dataInstance.iri] = ownerId
-        projects.push(instance2Project(dataInstance, ownerId));
+        projects.push(instance2Project(dataInstance, ownerId, registration.iri));
       }
     }
 
-    return {ownerId, projects}
+    return {ownerId, projects, registrations}
   }
 
   async updateProject(project: Project) {
@@ -100,9 +104,12 @@ export class SaiService {
     } else {
       const user = this.session.dataOwners.find((agent) => agent.iri === project.owner);
       if (!user) {
-        throw new Error(`data registration not found for ${project.owner}`)
+        throw new Error(`user not found for ${project.owner}`)
       }
-      const registration = user.selectRegistrations(shapeTrees.project)[0] // TODO handle multiple
+      const registration = user.selectRegistrations(shapeTrees.project).find(registration => registration.iri === project.registration)
+      if (!registration) {
+        throw new Error(`data registrationnot found for ${project.registration}`)
+      }
       instance = await registration.newDataInstance()
       console.log(instance.iri, [...instance.dataset])
       console.log(this.cache)
@@ -113,7 +120,7 @@ export class SaiService {
 
     await instance.update(instance.dataset)
 
-    return instance2Project(instance, project.owner)
+    return instance2Project(instance, project.owner, project.registration)
   }
 
   async loadTasks(projectId: string): Promise<{projectId: string, tasks: Task[]}> {

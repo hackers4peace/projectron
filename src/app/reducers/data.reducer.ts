@@ -3,18 +3,21 @@ import { agentsKnown, loadProjectsSuccess, loadTasksSuccess, updateProjectSucces
 import { Project } from '../models/project.model';
 import { Task } from '../models/task.model';
 import { Agent } from '../models/agent.model';
+import { Registration } from '../models/registration.model';
 
 
 export const dataFeatureKey = 'data';
 
 export interface State {
   projects: {[ownerId: string]: Project[]};
+  registrations: {[ownerId: string]: Registration[]};
   tasks: {[projectId: string]: Task[]};
   agents: Agent[];
 }
 
 export const initialState: State = {
   projects: {},
+  registrations: {},
   tasks: {},
   agents: []
 };
@@ -22,7 +25,11 @@ export const initialState: State = {
 export const reducer = createReducer(
   initialState,
   on(agentsKnown, (state, { agents }) => ({...state, agents })),
-  on(loadProjectsSuccess, (state, {ownerId, projects}) => ({...state, projects: {...state.projects, [ownerId]: projects} })),
+  on(loadProjectsSuccess, (state, {ownerId, projects, registrations}) => ({
+    ...state,
+    projects: {...state.projects, [ownerId]: projects},
+    registrations: {...state.registrations, [ownerId]: registrations}
+  })),
   on(updateProjectSuccess, (state, {project}) => {
     const oldProjects = state.projects[project.owner]
     const index = oldProjects.findIndex(element => element.id === project.id)

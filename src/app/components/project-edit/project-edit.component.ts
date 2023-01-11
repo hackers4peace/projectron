@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { filter, tap, mergeMap, Observable, take } from 'rxjs';
+import { filter, tap, mergeMap, Observable, take, map } from 'rxjs';
 import { updateProject } from 'src/app/actions/data.actions';
 import { Project } from 'src/app/models/project.model';
 import { selectProject } from 'src/app/selectors/data.selector';
@@ -26,7 +26,8 @@ export class ProjectEditComponent implements OnInit {
 
   ngOnInit(): void {
     this.project$ = this.route.queryParams.pipe(
-      mergeMap(params => this.store.select(selectProject(params['id']))),
+      map(params => decodeURIComponent(params['projectId'])),
+      mergeMap(projectId => this.store.select(selectProject(projectId))),
     );
   }
   onSubmit() {

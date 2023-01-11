@@ -5,14 +5,17 @@
         <mat-option *ngFor="let agent of (agents$ | async)" [value]="agent.id">{{ agent.label }}</mat-option>
       </mat-select>
     </mat-form-field>
-    <div>
-      <button mat-raised-button color="primary" (click)="create()">Create</button>
-    </div>
-    <div>
-      <mat-nav-list>
-        <a *ngFor="let project of (projects$ | async)" [routerLink]="['/project']" [queryParams]="{projectId: project.id | encodeURIComponent, agentId: selectedAgent.id | encodeURIComponent}" mat-list-item href="...">{{ project.label }}</a>
-      </mat-nav-list>
-    </div>
+    <div *ngFor="let registration of (registrations$ | async)">
+      <h3>{{registration.label}}</h3>
+      <div>
+        <button mat-raised-button color="primary" (click)="create(registration.id)">Create</button>
+      </div>
+      <div>
+        <mat-nav-list>
+          <a *ngFor="let project of (projectsForRegistration(registration.id) | async)" [routerLink]="['/project']" [queryParams]="{projectId: project.id | encodeURIComponent, agentId: selectedAgent.id | encodeURIComponent}" mat-list-item href="...">{{ project.label }}</a>
+        </mat-nav-list>
+      </div>
+    </div> 
 
   </mat-drawer>
 

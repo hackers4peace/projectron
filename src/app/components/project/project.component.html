@@ -5,7 +5,7 @@
     </mat-card-header>
     <mat-card-actions>
       <!-- TODO: show conditionally based on access mode -->
-      <button mat-button [routerLink]="['/project-edit']" [queryParams]="{id: project.id}">EDIT</button>
+      <button mat-button [routerLink]="['/project-edit']" [queryParams]="{projectId: project.id | encodeURIComponent, agentId: project.owner | encodeURIComponent}">EDIT</button>
     </mat-card-actions>
   </mat-card>
 

@@ -1,6 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { Agent } from '../models/agent.model';
 import { Project } from '../models/project.model';
+import { Registration } from '../models/registration.model';
 import { Task } from '../models/task.model';
 
 export const agentsKnown = createAction(
@@ -15,7 +16,7 @@ export const loadProjects = createAction(
 
 export const loadProjectsSuccess = createAction(
   '[Data] Load Projects Success',
-  props<{ ownerId: string, projects: Project[] }>()
+  props<{ ownerId: string, projects: Project[], registrations: Registration[] }>()
 );
 
 export const loadProjectsFailure = createAction(
