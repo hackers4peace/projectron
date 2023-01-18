@@ -19,6 +19,6 @@ export const initialState: State = {
 export const reducer = createReducer(
   initialState,
   on(userIdReceived, (state, {userId}) => ({...state, userId})),
-  on(applicationRegistrationDiscovered, (state) => ({...state, isAuthorized: true})),
+  on(applicationRegistrationDiscovered, (state, {isAuthorized, authorizationRedirectUri}) => ({...state, authorizationRedirectUri, isAuthorized})),
   on(authorizationRedirectUriDiscovered, (state, {authorizationRedirectUri}) => ({...state, authorizationRedirectUri}))
 );

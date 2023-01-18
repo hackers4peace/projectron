@@ -36,7 +36,7 @@ export class CoreEffects {
     mergeMap(({userId}) => from(this.sai.buildSession(userId))),
     map(session => {
       if(session.hasApplicationRegistration) {
-        return applicationRegistrationDiscovered()
+        return applicationRegistrationDiscovered({authorizationRedirectUri: session.authorizationRedirectUri!, isAuthorized: !!session.hasApplicationRegistration.hasAccessGrant.granted})
       } else if (session.authorizationRedirectUri) {
         return authorizationRedirectUriDiscovered({authorizationRedirectUri: session.authorizationRedirectUri})
       } else {
