@@ -6,6 +6,7 @@
     <mat-card-actions>
       <!-- TODO: show conditionally based on access mode -->
       <button mat-button [routerLink]="['/project-edit']" [queryParams]="{projectId: project.id | encodeURIComponent, agentId: project.owner | encodeURIComponent}">EDIT</button>
+      <button *ngIf="(tasks$ | async)?.length === 0" mat-raised-button color="warn" (click)="delete()">DELETE</button>
     </mat-card-actions>
   </mat-card>
 

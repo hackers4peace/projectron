@@ -68,3 +68,33 @@ export const updateTaskFailure = createAction(
   '[Data] Update Task Failure',
   props<{ error: any }>()
 )
+
+export const deleteTask = createAction(
+  '[Data] Delete Task',
+  props<{ task: Task }>()
+)
+
+export const deleteTaskSuccess = createAction(
+  '[Data] Delete Task Success',
+  props<{ task: Task }>()
+)
+
+export const deleteTaskFailure = createAction(
+  '[Data] Delete Task Failure',
+  props<{ error: any }>()
+)
+
+export const deleteProject = createAction(
+  '[Data] Delete Project',
+  props<{ project: Project }>()
+)
+
+export const deleteProjectSuccess = createAction(
+  '[Data] Delete Project Success',
+  props<{ project: Project }>()
+)
+
+export const deleteProjectFailure = createAction(
+  '[Data] Delete Project Failure',
+  props<{ error: any }>()
+)

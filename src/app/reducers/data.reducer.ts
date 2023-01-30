@@ -1,10 +1,9 @@
 import { createReducer, on } from '@ngrx/store';
-import { agentsKnown, loadProjectsSuccess, loadTasksSuccess, updateProjectSuccess, updateTaskSuccess } from '../actions/data.actions';
+import { agentsKnown, deleteProjectSuccess, deleteTaskSuccess, loadProjectsSuccess, loadTasksSuccess, updateProjectSuccess, updateTaskSuccess } from '../actions/data.actions';
 import { Project } from '../models/project.model';
 import { Task } from '../models/task.model';
 import { Agent } from '../models/agent.model';
 import { Registration } from '../models/registration.model';
-
 
 export const dataFeatureKey = 'data';
 
@@ -44,5 +43,15 @@ export const reducer = createReducer(
     const newTasks = [...oldTasks]
     newTasks[index] = task
     return {...state, tasks: {...state.tasks, [task.project]: newTasks} }
+  }),
+  on(deleteTaskSuccess, (state, {task}) => {
+    const oldTasks = state.tasks[task.project]
+    const newTasks = oldTasks.filter(t => t.id !== task.id);
+    return {...state, tasks: {...state.tasks, [task.project]: newTasks} }
+  }),
+  on(deleteProjectSuccess, (state, {project}) => {
+    const oldProjects = state.projects[project.owner];
+    const newProjects = oldProjects.filter(p => p.id !== project.id);
+    return {...state, projects: {...state.projects, [project.owner]: newProjects} }
   })
 );

@@ -168,4 +168,32 @@ export class SaiService {
 
     return instance2Task(instance, task.project, task.owner)
   }
+
+  async deleteTask(task: Task): Promise<Task> {
+    if (!this.session) {
+      throw new Error('buildSession was not called');
+    }
+    let instance: DataInstance
+
+    instance = this.cache[task.id];
+    await instance.delete();
+
+    delete this.cache[task.id];
+
+    return task;
+  }
+
+  async deleteProject(project: Project): Promise<Project> {
+    if (!this.session) {
+      throw new Error('buildSession was not called');
+    }
+    let instance: DataInstance
+
+    instance = this.cache[project.id];
+    await instance.delete();
+
+    delete this.cache[project.id];
+
+    return project;
+  }
 }

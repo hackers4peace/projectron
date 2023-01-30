@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { catchError, from, map, of, switchMap } from 'rxjs';
 import { applicationRegistrationDiscovered } from '../actions/core.actions';
-import { agentsKnown, loadProjects, loadProjectsFailure, loadProjectsSuccess, loadTasks, loadTasksFailure, loadTasksSuccess, updateProject, updateProjectFailure, updateProjectSuccess, updateTask, updateTaskFailure, updateTaskSuccess } from '../actions/data.actions';
+import { agentsKnown, deleteProject, deleteProjectFailure, deleteProjectSuccess, deleteTask, deleteTaskFailure, deleteTaskSuccess, loadProjects, loadProjectsFailure, loadProjectsSuccess, loadTasks, loadTasksFailure, loadTasksSuccess, updateProject, updateProjectFailure, updateProjectSuccess, updateTask, updateTaskFailure, updateTaskSuccess } from '../actions/data.actions';
 import { SaiService } from '../services/sai.service';
 
 
@@ -37,7 +37,7 @@ export class DataEffects {
     map(project => updateProjectSuccess({ project })),
     catchError(error => of(updateProjectFailure({error: { name: error.name, message: error.message}})))
   ))
-  
+
   loadTasks$ = createEffect(() => this.actions$.pipe(
     ofType(loadTasks),
     switchMap(({projectId}) => from(this.sai.loadTasks(projectId))),
@@ -50,5 +50,19 @@ export class DataEffects {
     switchMap(({ task }) => from(this.sai.updateTask(task))),
     map(task => updateTaskSuccess({ task })),
     catchError(error => of(updateTaskFailure({error: { name: error.name, message: error.message}})))
+  ))
+
+  deleteTask$ = createEffect(() => this.actions$.pipe(
+    ofType(deleteTask),
+    switchMap(({ task }) => from(this.sai.deleteTask(task))),
+    map(task => deleteTaskSuccess({ task })),
+    catchError(error => of(deleteTaskFailure({error: { name: error.name, message: error.message}})))
+  ))
+
+  deleteProject$ = createEffect(() => this.actions$.pipe(
+    ofType(deleteProject),
+    switchMap(({ project }) => from(this.sai.deleteProject(project))),
+    map(project => deleteProjectSuccess({ project })),
+    catchError(error => of(deleteProjectFailure({error: { name: error.name, message: error.message}})))
   ))
 }

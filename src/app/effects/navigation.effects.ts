@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType, concatLatestFrom } from '@ngrx/effects';
 import { applicationRegistrationDiscovered, authorizationRedirectUriDiscovered } from '../actions/core.actions'
 import { tap } from "rxjs/operators";
 import { Router } from '@angular/router';
-import { updateProjectSuccess, updateTaskSuccess } from '../actions/data.actions';
+import { deleteProjectSuccess, deleteTaskSuccess, updateProjectSuccess, updateTaskSuccess } from '../actions/data.actions';
 import { userId as selectUserId } from '../selectors/core.selector';
 import { Store } from '@ngrx/store';
 
@@ -21,7 +21,7 @@ export class NavigationEffects {
   ), {dispatch: false});
 
   naviagateToDashboard$ = createEffect(() => this.actions$.pipe(
-    ofType(applicationRegistrationDiscovered),
+    ofType(applicationRegistrationDiscovered, deleteProjectSuccess),
     concatLatestFrom(() => this.store.select(selectUserId)),
     tap(([action, userId]) => this.router.navigateByUrl(`/?agentId=${encodeURIComponent(userId!)}`))
   ), {dispatch: false});
@@ -33,8 +33,7 @@ export class NavigationEffects {
   ), {dispatch: false});
 
   naviagateBackToProjectFromTask$ = createEffect(() => this.actions$.pipe(
-    ofType(updateTaskSuccess),
+    ofType(updateTaskSuccess, deleteTaskSuccess),
     tap(({ task }) => this.router.navigateByUrl(`/project?projectId=${encodeURIComponent(task.project!)}&agentId=${encodeURIComponent(task.owner!)}`))
   ), {dispatch: false});
-
 }
