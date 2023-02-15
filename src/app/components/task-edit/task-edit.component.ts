@@ -43,12 +43,14 @@ export class TaskEditComponent implements OnInit {
     });
   }
   delete() {
-    this.task$?.pipe(
-      filter(task => !!task),
-      take(1),
-    )
-    .subscribe(task => {
-      this.store.dispatch(deleteTask({ task }));
-    });
+    if (confirm('Are you sure to delete')) {
+      this.task$?.pipe(
+        filter(task => !!task),
+        take(1),
+      )
+      .subscribe(task => {
+        this.store.dispatch(deleteTask({ task }));
+      });
+    }
   }
 }

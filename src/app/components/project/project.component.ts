@@ -43,13 +43,15 @@ export class ProjectComponent implements OnInit {
     });
   }
   delete() {
-    this.project$?.pipe(
-      filter(project => !!project),
-      take(1),
-    )
-    .subscribe(project => {
-      this.store.dispatch(deleteProject({ project }));
-    });
+    if (confirm('Are you sure to delete')) {
+      this.project$?.pipe(
+        filter(project => !!project),
+        take(1),
+      )
+      .subscribe(project => {
+        this.store.dispatch(deleteProject({ project }));
+      });
+    }
   }
 
 }

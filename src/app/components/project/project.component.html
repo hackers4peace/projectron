@@ -4,23 +4,31 @@
       <mat-card-title>{{ project.label }}</mat-card-title>
     </mat-card-header>
     <mat-card-actions *ngIf="project.canUpdate">
-      <button mat-button [routerLink]="['/project-edit']" [queryParams]="{projectId: project.id | encodeURIComponent, agentId: project.owner | encodeURIComponent}">EDIT</button>
-      <button *ngIf="(tasks$ | async)?.length === 0" mat-raised-button color="warn" (click)="delete()">DELETE</button>
+      <button mat-icon-button [routerLink]="['/project-edit']" [queryParams]="{projectId: project.id | encodeURIComponent, agentId: project.owner | encodeURIComponent}">
+        <mat-icon>edit_square</mat-icon>
+      </button>
+      <button *ngIf="(tasks$ | async)?.length === 0" mat-icon-button color="warn" (click)="delete()">
+        <mat-icon>delete_forever</mat-icon>
+      </button>
     </mat-card-actions>
   </mat-card>
 
   <mat-card *ngIf="(tasks$ | async) as tasks">
     <mat-card-header>
-      <mat-card-title>Tasks</mat-card-title>
+      <mat-card-title>
+        <span>Tasks</span>
+        <button *ngIf="project.canAddTasks" mat-icon-button (click)="create()">
+          <mat-icon>add_box</mat-icon>
+        </button>
+      </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-    <div *ngIf="project.canAddTasks">
-      <button mat-raised-button color="primary" (click)="create()">Create</button>
-    </div>
       <mat-list role="list">
           <mat-list-item *ngFor="let task of tasks" role="listitem">
             <span>{{ task.label }}</span>
-            <button *ngIf="task.canUpdate" [routerLink]="['/task-edit']" [queryParams]="{taskId: task.id, projectId: project.id | encodeURIComponent, agentId: project.owner | encodeURIComponent}" mat-raised-button color="primary">Edit</button>
+            <button mat-icon-button *ngIf="task.canUpdate" [routerLink]="['/task-edit']" [queryParams]="{taskId: task.id, projectId: project.id | encodeURIComponent, agentId: project.owner | encodeURIComponent}">
+              <mat-icon>edit_square</mat-icon>
+            </button>
           </mat-list-item>
       </mat-list>
     </mat-card-content>
