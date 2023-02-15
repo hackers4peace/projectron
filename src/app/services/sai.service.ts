@@ -2,19 +2,26 @@ import { Injectable } from '@angular/core';
 import { getDefaultSession } from '@inrupt/solid-client-authn-browser';
 import { Application } from '@janeirodigital/interop-application';
 import { DataInstance } from '@janeirodigital/interop-data-model';
-import { RDFS } from '@janeirodigital/interop-namespaces';
+import { ACL, RDFS } from '@janeirodigital/interop-namespaces';
 import { environment } from 'src/environments/environment';
 import { Project } from '../models/project.model';
 import { Task } from '../models/task.model';
 import { Agent } from '../models/agent.model';
 import { Registration } from '../models/registration.model';
 
+const shapeTrees = {
+  project: 'http://localhost:3000/shapetrees/trees/Project',
+  task: 'http://localhost:3000/shapetrees/trees/Task'
+}
+
 function instance2Project(instance: DataInstance, owner: string, registration: string): Project {
   return {
     id: instance.iri,
     label: instance.getObject(RDFS.label)!.value,
     owner,
-    registration
+    registration,
+    canUpdate: instance.accessMode.includes(ACL.Update.value),
+    canAddTasks: instance.findChildGrant(shapeTrees.task)?.accessMode.includes(ACL.Create.value),
   }
 }
 
@@ -23,14 +30,12 @@ function instance2Task(instance: DataInstance, project: string, owner: string): 
     id: instance.iri,
     label: instance.getObject(RDFS.label)!.value,
     project,
-    owner
+    owner,
+    canUpdate: instance.accessMode.includes(ACL.Update.value),
+    canDelete: instance.accessMode.includes(ACL.Delete.value),
   }
 }
 
-const shapeTrees = {
-  project: 'http://localhost:3000/shapetrees/trees/Project',
-  task: 'http://localhost:3000/shapetrees/trees/Task'
-}
 
 @Injectable({
   providedIn: 'root'
@@ -79,7 +84,12 @@ export class SaiService {
     const projects: Project[] = [];
     const registrations: Registration[] = [];
     for (const registration of user.selectRegistrations(shapeTrees.project)) {
-      registrations.push({ id: registration.iri, label: 'TODO', owner: ownerId})
+      registrations.push({
+          id: registration.iri,
+          label: 'TODO',
+          owner: ownerId,
+          canCreate: registration.grant.accessMode.includes(ACL.Create.value),
+      })
       for await (const dataInstance of registration.dataInstances) {
         this.cache[dataInstance.iri] = dataInstance
         this.ownerIndex[dataInstance.iri] = ownerId
@@ -111,8 +121,6 @@ export class SaiService {
         throw new Error(`data registrationnot found for ${project.registration}`)
       }
       instance = await registration.newDataInstance()
-      console.log(instance.iri, [...instance.dataset])
-      console.log(this.cache)
       this.cache[instance.iri] = instance
     }
 
@@ -156,8 +164,6 @@ export class SaiService {
       if (!project) {
         throw new Error(`project not found ${task.project}`)
       }
-      console.log(project.iri, [...project.dataset])
-      console.log(this.cache)
       instance = await project.newChildDataInstance(shapeTrees.task)
       this.cache[instance.iri] = instance
     }

@@ -7,7 +7,7 @@
     </mat-form-field>
     <div *ngFor="let registration of (registrations$ | async)">
       <h3>{{registration.label}}</h3>
-      <div>
+      <div *ngIf="registration.canCreate">
         <button mat-raised-button color="primary" (click)="create(registration.id)">Create</button>
       </div>
       <div>
@@ -15,7 +15,7 @@
           <a *ngFor="let project of (projectsForRegistration(registration.id) | async)" [routerLink]="['/project']" [queryParams]="{projectId: project.id | encodeURIComponent, agentId: selectedAgent.id | encodeURIComponent}" mat-list-item href="...">{{ project.label }}</a>
         </mat-nav-list>
       </div>
-    </div> 
+    </div>
 
   </mat-drawer>
 

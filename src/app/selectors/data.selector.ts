@@ -44,7 +44,7 @@ export const selectProjectsForOwner = (ownerId: string) =>
 export const selectProjects = (ownerId: string, registrationId: string) =>
   createSelector(
     selectData,
-    data => data.projects[ownerId].filter(project => project.registration === registrationId)
+    data => data.projects[ownerId]?.filter(project => project.registration === registrationId) || []
   )
 
 export const selectRegistrations = (ownerId: string) =>

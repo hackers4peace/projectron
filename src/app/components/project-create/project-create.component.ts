@@ -42,7 +42,7 @@ export class ProjectCreateComponent implements OnInit {
       take(1),
       withLatestFrom(this.registrationId$),
     ).subscribe(([agent, registrationId]) => {
-      this.store.dispatch(updateProject({ project: { id: 'DRAFT', owner: agent.id, registration: registrationId, label } }));
+      this.store.dispatch(updateProject({ project: { id: 'DRAFT', owner: agent.id, registration: registrationId, label} }));
     });
   }
 }

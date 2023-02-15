@@ -3,8 +3,7 @@
     <mat-card-header>
       <mat-card-title>{{ project.label }}</mat-card-title>
     </mat-card-header>
-    <mat-card-actions>
-      <!-- TODO: show conditionally based on access mode -->
+    <mat-card-actions *ngIf="project.canUpdate">
       <button mat-button [routerLink]="['/project-edit']" [queryParams]="{projectId: project.id | encodeURIComponent, agentId: project.owner | encodeURIComponent}">EDIT</button>
       <button *ngIf="(tasks$ | async)?.length === 0" mat-raised-button color="warn" (click)="delete()">DELETE</button>
     </mat-card-actions>
@@ -15,11 +14,14 @@
       <mat-card-title>Tasks</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-    <div>
+    <div *ngIf="project.canAddTasks">
       <button mat-raised-button color="primary" (click)="create()">Create</button>
     </div>
       <mat-list role="list">
-          <mat-list-item *ngFor="let task of tasks" role="listitem"><a [routerLink]="['/task-edit']" [queryParams]="{taskId: task.id, projectId: project.id | encodeURIComponent, agentId: project.owner | encodeURIComponent}">{{ task.label }}</a></mat-list-item>
+          <mat-list-item *ngFor="let task of tasks" role="listitem">
+            <span>{{ task.label }}</span>
+            <button *ngIf="task.canUpdate" [routerLink]="['/task-edit']" [queryParams]="{taskId: task.id, projectId: project.id | encodeURIComponent, agentId: project.owner | encodeURIComponent}" mat-raised-button color="primary">Edit</button>
+          </mat-list-item>
       </mat-list>
     </mat-card-content>
   </mat-card>
