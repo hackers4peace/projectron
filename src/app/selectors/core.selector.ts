@@ -13,8 +13,3 @@ export const isAuthorized = createSelector(
   selectCore,
   core => core.isAuthorized,
 );
-
-export const authorizationRedirectUri = createSelector(
-  selectCore,
-  core => core.authorizationRedirectUri,
-)

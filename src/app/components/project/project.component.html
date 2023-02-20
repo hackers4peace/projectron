@@ -10,6 +10,9 @@
       <button *ngIf="(tasks$ | async)?.length === 0" mat-icon-button color="warn" (click)="delete()">
         <mat-icon>delete_forever</mat-icon>
       </button>
+      <button mat-icon-button (click)="share()">
+        <mat-icon>share</mat-icon>
+      </button>
     </mat-card-actions>
   </mat-card>
 

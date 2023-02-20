@@ -5,7 +5,6 @@ import { AuthnService } from '../services/authn.service';
 import { map, mergeMap, tap } from "rxjs/operators";
 import { from } from 'rxjs';
 import { SaiService } from '../services/sai.service';
-import { authorizationRedirectUri } from '../selectors/core.selector';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 
@@ -36,9 +35,9 @@ export class CoreEffects {
     mergeMap(({userId}) => from(this.sai.buildSession(userId))),
     map(session => {
       if(session.hasApplicationRegistration) {
-        return applicationRegistrationDiscovered({authorizationRedirectUri: session.authorizationRedirectUri!, isAuthorized: !!session.hasApplicationRegistration.hasAccessGrant.granted})
+        return applicationRegistrationDiscovered({isAuthorized: !!session.hasApplicationRegistration.hasAccessGrant.granted})
       } else if (session.authorizationRedirectUri) {
-        return authorizationRedirectUriDiscovered({authorizationRedirectUri: session.authorizationRedirectUri})
+        return authorizationRedirectUriDiscovered()
       } else {
         throw new Error('Impossible to authorize!')
       }
@@ -47,7 +46,6 @@ export class CoreEffects {
 
   requestAuthorization$ = createEffect(() => this.actions$.pipe(
     ofType(authorizationRequested),
-    mergeMap(() => this.store.select(authorizationRedirectUri)),
-    tap(authorizationRedirectUri => this.sai.authorize(authorizationRedirectUri!))
+    tap(() => this.sai.authorize())
   ), {dispatch: false});
 }

@@ -23,7 +23,14 @@ export class NavigationEffects {
   naviagateToDashboard$ = createEffect(() => this.actions$.pipe(
     ofType(applicationRegistrationDiscovered, deleteProjectSuccess),
     concatLatestFrom(() => this.store.select(selectUserId)),
-    tap(([action, userId]) => this.router.navigateByUrl(`/?agentId=${encodeURIComponent(userId!)}`))
+    // TODO: move to restore guard
+    tap(([action, userId]) =>  {
+      const restorePath = window.localStorage.getItem('restorePath');
+      if (restorePath) {
+        window.localStorage.removeItem('restorePath');
+      }
+      this.router.navigateByUrl( restorePath || `/?agentId=${encodeURIComponent(userId!)}`)
+    })
   ), {dispatch: false});
 
 

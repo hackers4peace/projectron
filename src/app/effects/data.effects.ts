@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { catchError, from, map, of, switchMap } from 'rxjs';
+import { catchError, from, map, of, switchMap, tap } from 'rxjs';
 import { applicationRegistrationDiscovered } from '../actions/core.actions';
-import { agentsKnown, deleteProject, deleteProjectFailure, deleteProjectSuccess, deleteTask, deleteTaskFailure, deleteTaskSuccess, loadProjects, loadProjectsFailure, loadProjectsSuccess, loadTasks, loadTasksFailure, loadTasksSuccess, updateProject, updateProjectFailure, updateProjectSuccess, updateTask, updateTaskFailure, updateTaskSuccess } from '../actions/data.actions';
+import { agentsKnown, deleteProject, deleteProjectFailure, deleteProjectSuccess, deleteTask, deleteTaskFailure, deleteTaskSuccess, loadProjects, loadProjectsFailure, loadProjectsSuccess, loadTasks, loadTasksFailure, loadTasksSuccess, shareProject, updateProject, updateProjectFailure, updateProjectSuccess, updateTask, updateTaskFailure, updateTaskSuccess } from '../actions/data.actions';
 import { SaiService } from '../services/sai.service';
 
 
@@ -65,4 +65,9 @@ export class DataEffects {
     map(project => deleteProjectSuccess({ project })),
     catchError(error => of(deleteProjectFailure({error: { name: error.name, message: error.message}})))
   ))
+
+  shareProject$ = createEffect(() => this.actions$.pipe(
+    ofType(shareProject),
+    tap(({project}) => this.sai.share(project))
+  ), {dispatch: false});
 }

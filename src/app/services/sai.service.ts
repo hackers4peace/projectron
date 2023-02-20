@@ -9,6 +9,12 @@ import { Task } from '../models/task.model';
 import { Agent } from '../models/agent.model';
 import { Registration } from '../models/registration.model';
 
+class NoSaiSessionError extends Error {
+  constructor() {
+    super('buildSession was not called');
+  }
+}
+
 const shapeTrees = {
   project: 'http://localhost:3000/shapetrees/trees/Project',
   task: 'http://localhost:3000/shapetrees/trees/Task'
@@ -55,13 +61,33 @@ export class SaiService {
     return this.session;
   }
 
-  authorize(authorizationRedirectUri: string) {
-    window.location.href = authorizationRedirectUri;
+  authorize() {
+    if (!this.session) {
+      throw new NoSaiSessionError();
+    }
+    if (this.session.authorizationRedirectUri) {
+      window.location.href = this.session.authorizationRedirectUri;
+    } else {
+      throw new Error('authorizationRedirectUri is undefined');
+    }
+  }
+
+  share(resource: {id: string}) {
+    if (!this.session) {
+      throw new NoSaiSessionError();
+    }
+    const shareUri = this.session.getShareUri(resource.id);
+    if (shareUri) {
+      window.localStorage.setItem('restorePath', `${window.location.pathname}${window.location.search}`)
+      window.location.href = shareUri;
+    } else {
+      throw new Error('shareUri is undefined')
+    }
   }
 
   async getAgents(): Promise<Agent[]> {
     if (!this.session) {
-      throw new Error('buildSession was not called');
+      throw new NoSaiSessionError();
     }
     const session = this.session
     const profiles = await Promise.all(
@@ -75,7 +101,7 @@ export class SaiService {
 
   async loadProjects(ownerId: string): Promise<{ownerId: string, projects: Project[], registrations: Registration[]}> {
     if (!this.session) {
-      throw new Error('buildSession was not called');
+      throw new NoSaiSessionError();
     }
     const user = this.session.dataOwners.find((agent) => agent.iri === ownerId);
     if (!user) {
@@ -102,7 +128,7 @@ export class SaiService {
 
   async updateProject(project: Project) {
     if (!this.session) {
-      throw new Error('buildSession was not called');
+      throw new NoSaiSessionError();
     }
     let instance: DataInstance
     if (project.id !== 'DRAFT') {
@@ -133,7 +159,7 @@ export class SaiService {
 
   async loadTasks(projectId: string): Promise<{projectId: string, tasks: Task[]}> {
     if (!this.session) {
-      throw new Error('buildSession was not called');
+      throw new NoSaiSessionError();
     }
     const project = this.cache[projectId]
     if (!project) {
@@ -150,7 +176,7 @@ export class SaiService {
 
   async updateTask(task: Task) {
     if (!this.session) {
-      throw new Error('buildSession was not called');
+      throw new NoSaiSessionError();
     }
     let instance: DataInstance
     if (task.id !== 'DRAFT') {
@@ -177,7 +203,7 @@ export class SaiService {
 
   async deleteTask(task: Task): Promise<Task> {
     if (!this.session) {
-      throw new Error('buildSession was not called');
+      throw new NoSaiSessionError();
     }
     let instance: DataInstance
 
@@ -191,7 +217,7 @@ export class SaiService {
 
   async deleteProject(project: Project): Promise<Project> {
     if (!this.session) {
-      throw new Error('buildSession was not called');
+      throw new NoSaiSessionError();
     }
     let instance: DataInstance
 

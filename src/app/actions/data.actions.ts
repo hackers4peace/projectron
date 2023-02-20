@@ -98,3 +98,8 @@ export const deleteProjectFailure = createAction(
   '[Data] Delete Project Failure',
   props<{ error: any }>()
 )
+
+export const shareProject = createAction(
+  '[Data] Share Project',
+  props<{ project: Project }>()
+)
