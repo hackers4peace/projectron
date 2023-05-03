@@ -1,0 +1,15 @@
+.visually-hidden {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+  }
+  
+  input.visually-hidden:is(:focus, :focus-within) + label {
+    outline: thin dotted;
+  }
+
+  img {
+    height: 100%;
+  }

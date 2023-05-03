@@ -42,6 +42,7 @@ export class TaskEditComponent implements OnInit {
       this.store.dispatch(updateTask({ task: { ...task, label } }));
     });
   }
+
   delete() {
     if (confirm('Are you sure to delete')) {
       this.task$?.pipe(

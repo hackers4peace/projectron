@@ -4,5 +4,5 @@ export interface Task {
   project: string,
   owner: string,
   canUpdate?: boolean,
-  canDelete?: boolean,
+  canDelete?: boolean
 }

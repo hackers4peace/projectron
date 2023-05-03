@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import { getDefaultSession } from '@inrupt/solid-client-authn-browser';
 import { Application } from '@janeirodigital/interop-application';
 import { DataInstance } from '@janeirodigital/interop-data-model';
-import { ACL, RDFS } from '@janeirodigital/interop-namespaces';
+import { ACL, RDFS, buildNamespace } from '@janeirodigital/interop-namespaces';
 import { environment } from 'src/environments/environment';
 import { Project } from '../models/project.model';
 import { Task } from '../models/task.model';
+import { Image } from '../models/image.model';
 import { Agent } from '../models/agent.model';
 import { Registration } from '../models/registration.model';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 class NoSaiSessionError extends Error {
   constructor() {
@@ -15,9 +17,12 @@ class NoSaiSessionError extends Error {
   }
 }
 
+const NFO = buildNamespace('http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#')
+
 const shapeTrees = {
   project: 'http://localhost:3000/shapetrees/trees/Project',
-  task: 'http://localhost:3000/shapetrees/trees/Task'
+  task: 'http://localhost:3000/shapetrees/trees/Task',
+  image: 'http://localhost:3000/shapetrees/trees/Image',
 }
 
 function instance2Project(instance: DataInstance, owner: string, registration: string): Project {
@@ -28,6 +33,7 @@ function instance2Project(instance: DataInstance, owner: string, registration: s
     registration,
     canUpdate: instance.accessMode.includes(ACL.Update.value),
     canAddTasks: instance.findChildGrant(shapeTrees.task)?.accessMode.includes(ACL.Create.value),
+    canAddImages: instance.findChildGrant(shapeTrees.image)?.accessMode.includes(ACL.Create.value),
   }
 }
 
@@ -42,6 +48,16 @@ function instance2Task(instance: DataInstance, project: string, owner: string): 
   }
 }
 
+function instance2Image(instance: DataInstance, project: string, owner: string): Image {
+  return {
+    id: instance.iri,
+    filename: instance.getObject(NFO.fileName)?.value,
+    project,
+    owner,
+    canUpdate: instance.accessMode.includes(ACL.Update.value),
+    canDelete: instance.accessMode.includes(ACL.Delete.value),
+  }
+}
 
 @Injectable({
   providedIn: 'root'
@@ -50,12 +66,15 @@ export class SaiService {
   private session: Application | undefined;
   private cache: { [key: string]: DataInstance } = {}
   private ownerIndex: { [key: string]: string } = {}
+  private fetch = getDefaultSession().fetch;
+
+  constructor(private sanitizer: DomSanitizer) {}
 
   async buildSession(userId: string): Promise<Application> {
     this.session = await Application.build(
       userId!,
       environment.applicationId,
-      { fetch: getDefaultSession().fetch, randomUUID: crypto.randomUUID.bind(crypto) }
+      { fetch: this.fetch, randomUUID: crypto.randomUUID.bind(crypto) }
     );
 
     return this.session;
@@ -195,7 +214,7 @@ export class SaiService {
     }
 
     instance.replaceValue(RDFS.label, task.label);
-
+    
     await instance.update(instance.dataset)
 
     return instance2Task(instance, task.project, task.owner)
@@ -227,5 +246,63 @@ export class SaiService {
     delete this.cache[project.id];
 
     return project;
+  }
+
+  async loadImages(projectId: string): Promise<{projectId: string, images: Image[]}> {
+    if (!this.session) {
+      throw new NoSaiSessionError();
+    }
+    const project = this.cache[projectId]
+    if (!project) {
+      throw new Error(`Project not found for: ${projectId}`)
+    }
+    const images = [];
+    for await (const dataInstance of project.getChildInstancesIterator(shapeTrees.image)) {
+      this.cache[dataInstance.iri] = dataInstance
+      images.push(instance2Image(dataInstance, projectId, this.ownerIndex[projectId]));
+    }
+
+    return {projectId, images}
+  }
+
+  async updateImage(image: Image, file?: File): Promise<Image> {
+    if (!this.session) {
+      throw new NoSaiSessionError();
+    }
+    let instance: DataInstance
+    if (image.id !== 'DRAFT') {
+      const cached = this.cache[image.id]
+      if (!cached) {
+        throw new Error(`Data Instance not found for: ${image.id}`)
+      }
+      instance = cached
+    } else {
+      if (!file) {
+        throw new Error(`image file missing`)
+      }
+      const project = this.cache[image.project]
+      if (!project) {
+        throw new Error(`project not found ${image.project}`)
+      }
+      
+
+      instance = await project.newChildDataInstance(shapeTrees.image)
+      instance.replaceValue(NFO.fileName, file.name)
+      // TODO change predicate
+      instance.replaceValue(NFO.mimeType, file.type)
+      this.cache[instance.iri] = instance
+      await instance.update(instance.dataset, file)
+    }
+
+    return instance2Image(instance, image.project, image.owner)
+  }
+
+
+  async dataUrl(url: string): Promise<SafeUrl> {
+    const fetch = getDefaultSession().fetch
+    return fetch(url)
+      .then(response => response.blob())
+      .then(blb => URL.createObjectURL(blb))
+      .then(url => this.sanitizer.bypassSecurityTrustUrl(url))
   }
 }

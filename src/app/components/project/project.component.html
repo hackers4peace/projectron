@@ -36,4 +36,29 @@
       </mat-list>
     </mat-card-content>
   </mat-card>
+
+  <mat-card *ngIf="(imageUrls$ | async) as imagesUrls">
+    <mat-card-header>
+      <mat-card-title>
+        <span>Images</span>
+        <button *ngIf="project.canAddImages" mat-icon-button (click)="imageInput.click()">
+          <mat-icon>add_box</mat-icon>
+        </button>
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+
+      <mat-list role="list">
+        <mat-list-item *ngFor="let imageUrl of imagesUrls" role="listitem">
+          <img matListItemAvatar [src]="imageUrl">
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+    <input
+      #imageInput
+      (change)="uploadImage($event)"
+      type="file"
+      accept="image/*"
+      class="visually-hidden">
+  </mat-card>
 </div>

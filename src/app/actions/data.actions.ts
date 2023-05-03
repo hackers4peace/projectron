@@ -3,6 +3,7 @@ import { Agent } from '../models/agent.model';
 import { Project } from '../models/project.model';
 import { Registration } from '../models/registration.model';
 import { Task } from '../models/task.model';
+import { Image } from '../models/image.model';
 
 export const agentsKnown = createAction(
   '[Data] Agents Known',
@@ -56,7 +57,7 @@ export const loadTasksFailure = createAction(
 
 export const updateTask = createAction(
   '[Data] Update Task',
-  props<{ task: Task }>()
+  props<{ task: Task}>()
 )
 
 export const updateTaskSuccess = createAction(
@@ -102,4 +103,49 @@ export const deleteProjectFailure = createAction(
 export const shareProject = createAction(
   '[Data] Share Project',
   props<{ project: Project }>()
+)
+
+export const loadImages = createAction(
+  '[Data] Load Images',
+  props<{ projectId: string }>()
+);
+
+export const loadImagesSuccess = createAction(
+  '[Data] Load Images Success',
+  props<{ projectId: string, images: Image[] }>()
+);
+
+export const loadImagesFailure = createAction(
+  '[Data] Load Images Failure',
+  props<{ error: any }>()
+);
+
+export const updateImage = createAction(
+  '[Data] Update Image',
+  props<{ image: Image, file: File}>()
+)
+
+export const updateImageSuccess = createAction(
+  '[Data] Update Image Success',
+  props<{ image: Image }>()
+)
+
+export const updateImageFailure = createAction(
+  '[Data] Update Image Failure',
+  props<{ error: any }>()
+)
+
+export const deleteImage = createAction(
+  '[Data] Delete Image',
+  props<{ image: Image }>()
+)
+
+export const deleteImageSuccess = createAction(
+  '[Data] Delete Image Success',
+  props<{ image: Image }>()
+)
+
+export const deleteImageFailure = createAction(
+  '[Data] Delete Image Failure',
+  props<{ error: any }>()
 )

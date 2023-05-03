@@ -5,4 +5,5 @@ export interface Project {
   registration: string,
   canUpdate?: boolean,
   canAddTasks?: boolean,
+  canAddImages?: boolean
 }

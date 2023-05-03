@@ -52,3 +52,9 @@ export const selectRegistrations = (ownerId: string) =>
     selectData,
     data => data.registrations[ownerId]
   )
+
+export const selectImages = (projectId: string) =>
+  createSelector(
+    selectData,
+    data => data.images[projectId]
+  )

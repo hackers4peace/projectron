@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { catchError, from, map, of, switchMap, tap } from 'rxjs';
 import { applicationRegistrationDiscovered } from '../actions/core.actions';
-import { agentsKnown, deleteProject, deleteProjectFailure, deleteProjectSuccess, deleteTask, deleteTaskFailure, deleteTaskSuccess, loadProjects, loadProjectsFailure, loadProjectsSuccess, loadTasks, loadTasksFailure, loadTasksSuccess, shareProject, updateProject, updateProjectFailure, updateProjectSuccess, updateTask, updateTaskFailure, updateTaskSuccess } from '../actions/data.actions';
+import { agentsKnown, deleteImage, deleteImageFailure, deleteImageSuccess, deleteProject, deleteProjectFailure, deleteProjectSuccess, deleteTask, deleteTaskFailure, deleteTaskSuccess, loadImages, loadImagesFailure, loadImagesSuccess, loadProjects, loadProjectsFailure, loadProjectsSuccess, loadTasks, loadTasksFailure, loadTasksSuccess, shareProject, updateImage, updateImageFailure, updateImageSuccess, updateProject, updateProjectFailure, updateProjectSuccess, updateTask, updateTaskFailure, updateTaskSuccess } from '../actions/data.actions';
 import { SaiService } from '../services/sai.service';
 
 
@@ -70,4 +70,25 @@ export class DataEffects {
     ofType(shareProject),
     tap(({project}) => this.sai.share(project))
   ), {dispatch: false});
+
+  loadImages$ = createEffect(() => this.actions$.pipe(
+    ofType(loadImages),
+    switchMap(({projectId}) => from(this.sai.loadImages(projectId))),
+    map(data => loadImagesSuccess(data)),
+    catchError(error => of(loadImagesFailure({error: { name: error.name, message: error.message}})))
+  ))
+
+  updateImage$ = createEffect(() => this.actions$.pipe(
+    ofType(updateImage),
+    switchMap(({ image, file }) => from(this.sai.updateImage(image, file))),
+    map(image => updateImageSuccess({ image })),
+    catchError(error => of(updateImageFailure({error: { name: error.name, message: error.message}})))
+  ))
+
+  // deleteImage$ = createEffect(() => this.actions$.pipe(
+  //   ofType(deleteImage),
+  //   switchMap(({ image }) => from(this.sai.deleteImage(image))),
+  //   map(image => deleteImageSuccess({ image })),
+  //   catchError(error => of(deleteImageFailure({error: { name: error.name, message: error.message}})))
+  // ))
 }

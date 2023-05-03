@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { catchError, filter, map, mergeMap, Observable, take, tap } from 'rxjs';
+import { catchError, filter, from, map, mergeMap, Observable, take, tap } from 'rxjs';
 import { Project } from 'src/app/models/project.model';
 import { Task } from 'src/app/models/task.model';
-import { deleteProject, loadTasks, shareProject } from 'src/app/actions/data.actions';
-import { selectProject, selectTasks } from 'src/app/selectors/data.selector';
+import { Image } from 'src/app/models/image.model';
+import { deleteProject, loadImages, loadTasks, shareProject, updateImage } from 'src/app/actions/data.actions';
+import { selectImages, selectProject, selectTasks } from 'src/app/selectors/data.selector';
+import { SaiService } from 'src/app/services/sai.service';
+import { SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-project',
@@ -15,11 +18,14 @@ import { selectProject, selectTasks } from 'src/app/selectors/data.selector';
 export class ProjectComponent implements OnInit {
   project$?: Observable<Project>;
   tasks$?: Observable<Task[]>;
+  images$?: Observable<Image[]>;
+  imageUrls$?: Observable<SafeUrl[]>;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private store: Store,
+    private sai: SaiService,
   ) { }
 
   ngOnInit(): void {
@@ -31,6 +37,16 @@ export class ProjectComponent implements OnInit {
       filter(project => !!project),
       tap(project => this.store.dispatch(loadTasks({ projectId: project.id }))),
       mergeMap(project =>  this.store.select(selectTasks(project.id))),
+    )
+    this.images$ = this.project$.pipe(
+      filter(project => !!project),
+      tap(project => this.store.dispatch(loadImages({ projectId: project.id }))),
+      mergeMap(project =>  this.store.select(selectImages(project.id))),
+    )
+
+    this.imageUrls$ = this.images$.pipe(
+      filter(Boolean),
+      mergeMap(images => from(Promise.all(images.map(image => this.sai.dataUrl(image.id)))))
     )
   }
   getProject(): Promise<Project> {
@@ -61,5 +77,20 @@ export class ProjectComponent implements OnInit {
   async share() {
     const project = await this.getProject();
     this.store.dispatch(shareProject({ project }));
+  }
+
+  uploadImage(event: Event) {
+    const target = event.target as HTMLInputElement
+    const file = target.files?.item(0)
+    if (file) {
+      this.project$?.pipe(
+        filter(task => !!task),
+        take(1),
+      )
+      .subscribe(project => {
+        const image = {id: 'DRAFT', project: project.id, owner: project.owner}
+        this.store.dispatch(updateImage({image, file}));
+      });
+    }
   }
 }
