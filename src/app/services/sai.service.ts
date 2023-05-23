@@ -10,6 +10,7 @@ import { Image } from '../models/image.model';
 import { Agent } from '../models/agent.model';
 import { Registration } from '../models/registration.model';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { FileInstance } from '../models/file.model';
 
 class NoSaiSessionError extends Error {
   constructor() {
@@ -18,11 +19,13 @@ class NoSaiSessionError extends Error {
 }
 
 const NFO = buildNamespace('http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#')
+const AWOL = buildNamespace('http://bblfish.net/work/atom-owl/2006-06-06/#')
 
 const shapeTrees = {
   project: 'http://localhost:3000/shapetrees/trees/Project',
   task: 'http://localhost:3000/shapetrees/trees/Task',
   image: 'http://localhost:3000/shapetrees/trees/Image',
+  file: 'http://localhost:3000/shapetrees/trees/File',
 }
 
 function instance2Project(instance: DataInstance, owner: string, registration: string): Project {
@@ -34,6 +37,7 @@ function instance2Project(instance: DataInstance, owner: string, registration: s
     canUpdate: instance.accessMode.includes(ACL.Update.value),
     canAddTasks: instance.findChildGrant(shapeTrees.task)?.accessMode.includes(ACL.Create.value),
     canAddImages: instance.findChildGrant(shapeTrees.image)?.accessMode.includes(ACL.Create.value),
+    canAddFiles: instance.findChildGrant(shapeTrees.file)?.accessMode.includes(ACL.Create.value),
   }
 }
 
@@ -48,7 +52,7 @@ function instance2Task(instance: DataInstance, project: string, owner: string): 
   }
 }
 
-function instance2Image(instance: DataInstance, project: string, owner: string): Image {
+function instance2File(instance: DataInstance, project: string, owner: string): Image {
   return {
     id: instance.iri,
     filename: instance.getObject(NFO.fileName)?.value,
@@ -248,6 +252,54 @@ export class SaiService {
     return project;
   }
 
+  async loadFiles(projectId: string): Promise<{projectId: string, files: FileInstance[]}> {
+    if (!this.session) {
+      throw new NoSaiSessionError();
+    }
+    const project = this.cache[projectId]
+    if (!project) {
+      throw new Error(`Project not found for: ${projectId}`)
+    }
+    const files = [];
+    for await (const dataInstance of project.getChildInstancesIterator(shapeTrees.file)) {
+      this.cache[dataInstance.iri] = dataInstance
+      files.push(instance2File(dataInstance, projectId, this.ownerIndex[projectId]));
+    }
+
+    return {projectId, files}
+  }
+
+  async updateFile(file: FileInstance, blob?: File): Promise<Image> {
+    if (!this.session) {
+      throw new NoSaiSessionError();
+    }
+    let instance: DataInstance
+    if (file.id !== 'DRAFT') {
+      const cached = this.cache[file.id]
+      if (!cached) {
+        throw new Error(`Data Instance not found for: ${file.id}`)
+      }
+      instance = cached
+    } else {
+      if (!blob) {
+        throw new Error(`image file missing`)
+      }
+      const project = this.cache[file.project]
+      if (!project) {
+        throw new Error(`project not found ${file.project}`)
+      }
+      
+
+      instance = await project.newChildDataInstance(shapeTrees.file)
+      instance.replaceValue(NFO.fileName, blob.name)
+      instance.replaceValue(AWOL.type, blob.type)
+      this.cache[instance.iri] = instance
+      await instance.update(instance.dataset, blob)
+    }
+
+    return instance2File(instance, file.project, file.owner)
+  }
+
   async loadImages(projectId: string): Promise<{projectId: string, images: Image[]}> {
     if (!this.session) {
       throw new NoSaiSessionError();
@@ -259,7 +311,7 @@ export class SaiService {
     const images = [];
     for await (const dataInstance of project.getChildInstancesIterator(shapeTrees.image)) {
       this.cache[dataInstance.iri] = dataInstance
-      images.push(instance2Image(dataInstance, projectId, this.ownerIndex[projectId]));
+      images.push(instance2File(dataInstance, projectId, this.ownerIndex[projectId]));
     }
 
     return {projectId, images}
@@ -288,21 +340,20 @@ export class SaiService {
 
       instance = await project.newChildDataInstance(shapeTrees.image)
       instance.replaceValue(NFO.fileName, file.name)
-      // TODO change predicate
-      instance.replaceValue(NFO.mimeType, file.type)
+      instance.replaceValue(AWOL.type, file.type)
       this.cache[instance.iri] = instance
       await instance.update(instance.dataset, file)
     }
 
-    return instance2Image(instance, image.project, image.owner)
+    return instance2File(instance, image.project, image.owner)
   }
 
 
-  async dataUrl(url: string): Promise<SafeUrl> {
+  async dataUrl(url: string, safe = true): Promise<SafeUrl | string> {
     const fetch = getDefaultSession().fetch
     return fetch(url)
       .then(response => response.blob())
       .then(blb => URL.createObjectURL(blb))
-      .then(url => this.sanitizer.bypassSecurityTrustUrl(url))
+      .then(url => safe ? this.sanitizer.bypassSecurityTrustUrl(url) : url)
   }
 }

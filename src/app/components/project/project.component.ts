@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { catchError, filter, from, map, mergeMap, Observable, take, tap } from 'rxjs';
 import { Project } from 'src/app/models/project.model';
 import { Task } from 'src/app/models/task.model';
 import { Image } from 'src/app/models/image.model';
-import { deleteProject, loadImages, loadTasks, shareProject, updateImage } from 'src/app/actions/data.actions';
-import { selectImages, selectProject, selectTasks } from 'src/app/selectors/data.selector';
+import { deleteProject, loadFiles, loadImages, loadTasks, shareProject, updateFile, updateImage } from 'src/app/actions/data.actions';
+import { selectFiles, selectImages, selectProject, selectTasks } from 'src/app/selectors/data.selector';
 import { SaiService } from 'src/app/services/sai.service';
 import { SafeUrl } from '@angular/platform-browser';
+import { FileInstance } from 'src/app/models/file.model';
 
 @Component({
   selector: 'app-project',
@@ -20,6 +21,10 @@ export class ProjectComponent implements OnInit {
   tasks$?: Observable<Task[]>;
   images$?: Observable<Image[]>;
   imageUrls$?: Observable<SafeUrl[]>;
+
+  files$?: Observable<FileInstance[]>;
+
+  @ViewChild('downloadLink') downloadLink?: ElementRef<HTMLAnchorElement>;
 
   constructor(
     private route: ActivatedRoute,
@@ -43,10 +48,14 @@ export class ProjectComponent implements OnInit {
       tap(project => this.store.dispatch(loadImages({ projectId: project.id }))),
       mergeMap(project =>  this.store.select(selectImages(project.id))),
     )
-
     this.imageUrls$ = this.images$.pipe(
       filter(Boolean),
       mergeMap(images => from(Promise.all(images.map(image => this.sai.dataUrl(image.id)))))
+    )
+    this.files$ = this.project$.pipe(
+      filter(Boolean),
+      tap(project => this.store.dispatch(loadFiles({ projectId: project.id }))),
+      mergeMap(project =>  this.store.select(selectFiles(project.id))),
     )
   }
   getProject(): Promise<Project> {
@@ -84,7 +93,7 @@ export class ProjectComponent implements OnInit {
     const file = target.files?.item(0)
     if (file) {
       this.project$?.pipe(
-        filter(task => !!task),
+        filter(Boolean),
         take(1),
       )
       .subscribe(project => {
@@ -92,5 +101,28 @@ export class ProjectComponent implements OnInit {
         this.store.dispatch(updateImage({image, file}));
       });
     }
+  }
+
+  uploadFile(event: Event) {
+    const target = event.target as HTMLInputElement
+    const blob = target.files?.item(0)
+    if (blob) {
+      this.project$?.pipe(
+        filter(Boolean),
+        take(1),
+      )
+      .subscribe(project => {
+        const file = {id: 'DRAFT', project: project.id, owner: project.owner}
+        this.store.dispatch(updateFile({file, blob}));
+      });
+    }
+  }
+  async downloadFile(file: FileInstance) {
+    // const safeUrl = await this.sai.dataUrl(file.id)
+    const element = this.downloadLink!.nativeElement
+    element.download = file.filename ?? 'file'
+ 
+    element.href = await this.sai.dataUrl(file.id, false) as string
+    element.click()
   }
 }

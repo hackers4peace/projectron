@@ -1,10 +1,11 @@
 import { createReducer, on } from '@ngrx/store';
-import { agentsKnown, deleteProjectSuccess, deleteTaskSuccess, loadImagesSuccess, loadProjectsSuccess, loadTasksSuccess, updateImageSuccess, updateProjectSuccess, updateTaskSuccess } from '../actions/data.actions';
+import { agentsKnown, deleteProjectSuccess, deleteTaskSuccess, loadFilesSuccess, loadImagesSuccess, loadProjectsSuccess, loadTasksSuccess, updateFileSuccess, updateImageSuccess, updateProjectSuccess, updateTaskSuccess } from '../actions/data.actions';
 import { Project } from '../models/project.model';
 import { Task } from '../models/task.model';
 import { Agent } from '../models/agent.model';
 import { Image } from '../models/image.model';
 import { Registration } from '../models/registration.model';
+import { FileInstance } from '../models/file.model';
 
 export const dataFeatureKey = 'data';
 
@@ -13,6 +14,7 @@ export interface State {
   registrations: {[ownerId: string]: Registration[]};
   tasks: {[projectId: string]: Task[]};
   images: {[projectId: string]: Image[]};
+  files: {[projectId: string]: FileInstance[]};
   agents: Agent[];
 }
 
@@ -21,6 +23,7 @@ export const initialState: State = {
   registrations: {},
   tasks: {},
   images: {},
+  files: {},
   agents: []
 };
 
@@ -39,6 +42,7 @@ export const reducer = createReducer(
     newProjects[index] = project
     return {...state, projects: {...state.projects, [project.owner]: newProjects} }
   }),
+
   on(loadTasksSuccess, (state, {projectId, tasks}) => ({...state, tasks: {...state.tasks, [projectId]: tasks} })),
   on(updateTaskSuccess, (state, {task}) => {
     const oldTasks = state.tasks[task.project]
@@ -57,10 +61,16 @@ export const reducer = createReducer(
     const newProjects = oldProjects.filter(p => p.id !== project.id);
     return {...state, projects: {...state.projects, [project.owner]: newProjects} }
   }),
-  on(loadImagesSuccess, (state, {projectId, images}) => ({...state, images: {...state.images, [projectId]: images} })),
 
+  on(loadImagesSuccess, (state, {projectId, images}) => ({...state, images: {...state.images, [projectId]: images} })),
   // TODO support updated besides add
   on(updateImageSuccess, (state, {image}) => {
     return {...state, images: {...state.images, [image.project]: [...state.images[image.project], image]} }
+  }),
+  
+  on(loadFilesSuccess, (state, {projectId, files}) => ({...state, files: {...state.files, [projectId]: files} })),
+   // TODO support updated besides add
+  on(updateFileSuccess, (state, {file}) => {
+    return {...state, files: {...state.files, [file.project]: [...state.files[file.project], file]} }
   }),
 );

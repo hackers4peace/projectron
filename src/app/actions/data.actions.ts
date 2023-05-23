@@ -4,6 +4,7 @@ import { Project } from '../models/project.model';
 import { Registration } from '../models/registration.model';
 import { Task } from '../models/task.model';
 import { Image } from '../models/image.model';
+import { FileInstance } from '../models/file.model';
 
 export const agentsKnown = createAction(
   '[Data] Agents Known',
@@ -120,6 +121,7 @@ export const loadImagesFailure = createAction(
   props<{ error: any }>()
 );
 
+// TODO rename file to blob to match updateFile
 export const updateImage = createAction(
   '[Data] Update Image',
   props<{ image: Image, file: File}>()
@@ -147,5 +149,50 @@ export const deleteImageSuccess = createAction(
 
 export const deleteImageFailure = createAction(
   '[Data] Delete Image Failure',
+  props<{ error: any }>()
+)
+
+export const loadFiles = createAction(
+  '[Data] Load Files',
+  props<{ projectId: string }>()
+);
+
+export const loadFilesSuccess = createAction(
+  '[Data] Load Files Success',
+  props<{ projectId: string, files: FileInstance[] }>()
+);
+
+export const loadFilesFailure = createAction(
+  '[Data] Load Files Failure',
+  props<{ error: any }>()
+);
+
+export const updateFile = createAction(
+  '[Data] Update File',
+  props<{ file: FileInstance, blob: File}>()
+)
+
+export const updateFileSuccess = createAction(
+  '[Data] Update File Success',
+  props<{ file: FileInstance }>()
+)
+
+export const updateFileFailure = createAction(
+  '[Data] Update File Failure',
+  props<{ error: any }>()
+)
+
+export const deleteFile = createAction(
+  '[Data] Delete File',
+  props<{ file: FileInstance }>()
+)
+
+export const deleteFileSuccess = createAction(
+  '[Data] Delete File Success',
+  props<{ file: FileInstance }>()
+)
+
+export const deleteFileFailure = createAction(
+  '[Data] Delete File Failure',
   props<{ error: any }>()
 )

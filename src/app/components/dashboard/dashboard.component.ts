@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SafeUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { getDefaultSession } from '@inrupt/solid-client-authn-browser';
 import { Store } from '@ngrx/store';
 import { filter, map, Observable, of, switchMap, take, tap } from 'rxjs';
 import { loadProjects } from 'src/app/actions/data.actions';
@@ -9,8 +7,6 @@ import { Agent } from 'src/app/models/agent.model';
 import { Project } from 'src/app/models/project.model';
 import { Registration } from 'src/app/models/registration.model';
 import { selectAgent, selectAgents, selectProjects, selectRegistrations } from 'src/app/selectors/data.selector';
-import { SaiService } from 'src/app/services/sai.service';
-
 
 @Component({
   selector: 'app-dashboard',
@@ -22,14 +18,11 @@ export class DashboardComponent implements OnInit {
   selectedAgent$?: Observable<Agent>
   projects$?: Observable<Project[]> 
   registrations$?: Observable<Registration[]>
-  cat?: Promise<SafeUrl>
-  calendar?: Promise<SafeUrl>
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private store: Store,
-    private sai: SaiService,
   ) { }
 
   selectAgent(agentId: string) {
@@ -61,7 +54,5 @@ export class DashboardComponent implements OnInit {
       tap(agent => this.store.dispatch(loadProjects({ ownerId: agent.id }))),
       switchMap(agent => this.store.select(selectRegistrations(agent.id)))
     )
-    this.cat = this.sai.dataUrl('http://localhost:3000/alice-work/dataRegistry/images/cat')
-    this.calendar = this.sai.dataUrl('http://localhost:3000/alice-work/dataRegistry/calendars/solid-interop')
   }
 }

@@ -1,9 +1,4 @@
-export interface Image {
-    id: string,
-    filename?: string,
-    project: string,
-    owner: string,
-    canUpdate?: boolean,
-    canDelete?: boolean,
-  }
+import { FileInstance } from "./file.model";
+
+export interface Image extends FileInstance {}
   

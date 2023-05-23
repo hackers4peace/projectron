@@ -59,6 +59,34 @@
       (change)="uploadImage($event)"
       type="file"
       accept="image/*"
+      class="visually-hidden">   
+  </mat-card>
+
+  <mat-card *ngIf="(files$ | async) as files">
+    <mat-card-header>
+      <mat-card-title>
+        <span>Files</span>
+        <button *ngIf="project.canAddFiles" mat-icon-button (click)="fileInput.click()">
+          <mat-icon>add_box</mat-icon>
+        </button>
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-list role="list">
+        <mat-list-item *ngFor="let file of files" role="listitem">
+          <span>{{ file.filename }}</span>
+          <button mat-icon-button (click)="downloadFile(file)">
+            <mat-icon>download</mat-icon>
+          </button>
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+    <a #downloadLink class="visually-hidden">
+    </a>
+    <input
+      #fileInput
+      (change)="uploadFile($event)"
+      type="file"
       class="visually-hidden">
   </mat-card>
 </div>

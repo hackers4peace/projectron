@@ -25,7 +25,7 @@ export const selectProject = (id: string) =>
 export const selectTasks = (projectId: string) =>
   createSelector(
     selectData,
-    data => data.tasks[projectId]
+    data => data.tasks[projectId] ?? []
   )
 
 export const selectTask = (id: string) =>
@@ -56,5 +56,12 @@ export const selectRegistrations = (ownerId: string) =>
 export const selectImages = (projectId: string) =>
   createSelector(
     selectData,
-    data => data.images[projectId]
+    data => data.images[projectId] ?? []
   )
+
+export const selectFiles = (projectId: string) =>
+  createSelector(
+    selectData,
+    data => data.files[projectId] ?? []
+  )
+  
