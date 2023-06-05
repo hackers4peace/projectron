@@ -23,6 +23,9 @@
       "dom"
     ],
     "skipLibCheck": true,
+    "paths": {
+      "stream": ["./node_modules/stream-browserify"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
